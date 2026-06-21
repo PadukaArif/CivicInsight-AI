@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - ./src/database:/app/src/database
+    env_file:
+      - .env
+    restart: always
