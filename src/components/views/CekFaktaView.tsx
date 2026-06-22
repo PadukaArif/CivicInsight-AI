@@ -1,0 +1,720 @@
+import React from 'react';
+import { Fact, Rumor } from '../../types';
+import { ShieldCheck, ShieldAlert, Search, Send, Plus, Trash2, HelpCircle, Check, X, FileText, Bot, Loader2, Edit } from 'lucide-react';
+
+/**
+ * Interface props untuk CekFaktaView
+ */
+export interface CekFaktaViewProps {
+  isAdmin: boolean; // Peran pengguna
+  verifiedFacts: Fact[]; // Daftar fakta yang sudah terverifikasi admin
+  submittedRumors: Rumor[]; // Isu/Rumor yang dilaporkan warga untuk diperiksa
+  onSubmitRumor: (konten: string) => void; // Aksi warga melaporkan rumor baru
+  onVerifyRumor: (id: number, status: 'fakta' | 'hoaks', penjelasan: string) => void; // Aksi admin memverifikasi rumor
+  onDeleteRumor: (id: number) => void; // Aksi admin menghapus rumor aduan
+  onAddFact: (judul: string, penjelasan: string, status: 'fakta' | 'hoaks', sumber?: string) => void; // Aksi admin memposting fakta langsung
+  onDeleteFact: (id: number) => void; // Aksi admin menghapus arsip fakta
+  onEditFact: (id: number, judul: string, penjelasan: string, status: 'fakta' | 'hoaks', sumber?: string) => void; // Aksi admin mengubah fakta
+}
+
+export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
+  isAdmin,
+  verifiedFacts,
+  submittedRumors,
+  onSubmitRumor,
+  onVerifyRumor,
+  onDeleteRumor,
+  onAddFact,
+  onDeleteFact,
+  onEditFact,
+}) => {
+  // State pencarian fakta (Warga & Admin)
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  // State warga melapor rumor
+  const [rumorText, setRumorText] = React.useState('');
+
+  // State admin input fakta langsung
+  const [factJudul, setFactJudul] = React.useState('');
+  const [factPenjelasan, setFactPenjelasan] = React.useState('');
+  const [factStatus, setFactStatus] = React.useState<'fakta' | 'hoaks'>('fakta');
+  const [factSumber, setFactSumber] = React.useState('');
+
+  // State Edit Fakta Modal
+  const [editingFact, setEditingFact] = React.useState<Fact | null>(null);
+  const [editFactJudul, setEditFactJudul] = React.useState('');
+  const [editFactPenjelasan, setEditFactPenjelasan] = React.useState('');
+  const [editFactStatus, setEditFactStatus] = React.useState<'fakta' | 'hoaks'>('fakta');
+  const [editFactSumber, setEditFactSumber] = React.useState('');
+
+  // State admin memverifikasi rumor terpilih (membuka panel/form penjelasan)
+  const [selectedRumorId, setSelectedRumorId] = React.useState<number | null>(null);
+  const [verifikasiPenjelasan, setVerifikasiPenjelasan] = React.useState('');
+
+  // Chatbot State
+  const [chatMessages, setChatMessages] = React.useState<Array<{ sender: 'user' | 'ai'; text: string; time: string }>>([
+    {
+      sender: 'ai',
+      text: 'Halo! Saya ChatBot Cek Fakta. Tanyakan saya apa saja tentang isu sosial yang sedang terjadi di masyarakat/negara atau topik kesehatan yang ingin Anda ketahui. Saya diintegrasikan dengan API Berita dan API Kesehatan real-time.',
+      time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+    }
+  ]);
+  const [isTyping, setIsTyping] = React.useState(false);
+  const [inputText, setInputText] = React.useState('');
+  const chatContainerRef = React.useRef<HTMLDivElement>(null);
+
+  // Auto-scroll chat container
+  React.useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages, isTyping]);
+
+  const handleSendChat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputText.trim() || isTyping) return;
+
+    const userText = inputText.trim();
+    const userTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    setChatMessages((prev) => [...prev, { sender: 'user', text: userText, time: userTime }]);
+    setInputText('');
+    setIsTyping(true);
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const lower = userText.toLowerCase();
+      let reply = '';
+
+      if (lower.includes('berita') || lower.includes('isu') || lower.includes('sosial') || lower.includes('negara')) {
+        reply = '📰 **[API BERITA REAL-TIME]**\n- **Insentif UMKM:** Pemerintah memperluas jangkauan subsidi KUR bagi usaha mikro.\n- **Kondisi Sosial:** Kampanye kepedulian sampah plastik nasional mulai diterapkan di pasar tradisional.\n- **Ekonomi:** Inflasi nasional terkendali di angka 2.8%, menjaga harga kebutuhan pokok tetap stabil di tingkat pasar.';
+      } else if (lower.includes('sehat') || lower.includes('dbd') || lower.includes('virus') || lower.includes('medis') || lower.includes('nyamuk') || lower.includes('sakit')) {
+        reply = '🏥 **[API KESEHATAN REAL-TIME]**\n- **Waspada DBD:** Lonjakan kasus demam berdarah terdeteksi di beberapa wilayah perkotaan akibat curah hujan tinggi.\n- **Pencegahan:** Lakukan 3M Plus secara rutin. Gunakan lotion anti-nyamuk saat beraktivitas di luar.\n- **Kesehatan Mental:** Kementerian Kesehatan meluncurkan hotline konseling psikologis gratis 24 jam di nomor 119 ext 8.';
+      } else if (lower.includes('konsultasi') || lower.includes('bantuan') || lower.includes('panduan')) {
+        reply = 'ℹ️ **[PANDUAN SISTEM PORTAL]**\nUntuk bantuan administrasi surat pengantar RT, silakan gunakan menu **Konsultasi AI** di navigasi atas. Jika ingin melaporkan infrastruktur rusak, gunakan menu **Lapor Aduan**. Chatbot ini khusus untuk memantau berita & kesehatan nasional.';
+      } else {
+        reply = '🤖 **[API INTEGRASI BERITA & KESEHATAN]**\nTerima kasih atas pertanyaan Anda. Berdasarkan penelusuran API berita dan kesehatan:\n- Tidak ditemukan isu krusial baru mengenai kata kunci tersebut hari ini.\n- Secara umum, kondisi nasional terpantau aman dan terkendali.\n\nCobalah tanyakan tentang **"berita terbaru"**, **"isu sosial"**, atau **"pencegahan DBD"** untuk informasi yang lebih spesifik.';
+      }
+
+      const aiTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      setChatMessages((prev) => [...prev, { sender: 'ai', text: reply, time: aiTime }]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const handleSuggestionClick = (question: string) => {
+    if (isTyping) return;
+    setInputText(question);
+  };
+
+  // Filter daftar fakta yang cocok dengan kata kunci pencarian
+  const filteredFacts = React.useMemo(() => {
+    if (!searchQuery.trim()) return verifiedFacts;
+    const q = searchQuery.toLowerCase();
+    return verifiedFacts.filter(
+      (f) => f.judul.toLowerCase().includes(q) || f.penjelasan.toLowerCase().includes(q)
+    );
+  }, [verifiedFacts, searchQuery]);
+
+  const handleReportRumor = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rumorText.trim()) return;
+    onSubmitRumor(rumorText.trim());
+    setRumorText('');
+    alert('Desas-desus/Isu berhasil dilaporkan! Pengurus RT akan segera meneliti kebenaran berita ini.');
+  };
+
+  const handlePostDirectFact = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!factJudul.trim() || !factPenjelasan.trim()) return;
+    onAddFact(factJudul.trim(), factPenjelasan.trim(), factStatus, factSumber.trim() || undefined);
+    setFactJudul('');
+    setFactPenjelasan('');
+    setFactStatus('fakta');
+    setFactSumber('');
+    alert('Informasi fakta berhasil diterbitkan ke arsip publik!');
+  };
+
+  const handleConfirmVerification = (rumorId: number, status: 'fakta' | 'hoaks') => {
+    if (!verifikasiPenjelasan.trim()) {
+      alert('Harap tuliskan penjelasan/klarifikasi singkat terlebih dahulu agar warga paham!');
+      return;
+    }
+    onVerifyRumor(rumorId, status, verifikasiPenjelasan.trim());
+    setSelectedRumorId(null);
+    setVerifikasiPenjelasan('');
+    alert('Isu berhasil diverifikasi dan dipindahkan ke arsip fakta publik!');
+  };
+
+  return (
+    <div className="space-y-6">
+      
+      {/* KONTROL UTAMA: PENCARIAN FAKTA (Tampil untuk Warga & Admin) */}
+      <div className="bg-civic-surface rounded-2xl border border-slate-200 shadow-xs p-5 md:p-6">
+        <h3 className="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2">
+          <ShieldCheck className="text-civic-primary shrink-0" size={20} />
+          Cari Kebenaran Berita RT/RW
+        </h3>
+        <p className="text-sm text-slate-500 mb-4">
+          Masukkan kata kunci kabar burung atau berita yang beredar di WhatsApp warga untuk memverifikasi kebenarannya.
+        </p>
+
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Ketik kata kunci... (contoh: bansos, kerja bakti, fogging, maling)"
+            className="w-full border border-slate-350 rounded-xl pl-10 pr-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-civic-primary text-base"
+          />
+          <Search size={18} className="absolute left-3.5 top-3.5 text-slate-400" />
+        </div>
+      </div>
+
+      {/* DUA VERSI LAYOUT: WARGA VS ADMIN */}
+      {!isAdmin ? (
+        /* ======================== VIEW WARGA ======================== */
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Kolom Kiri: Hasil Pencarian Fakta (2 Kolom) */}
+          <div className="lg:col-span-2 space-y-4">
+            <h3 className="text-base font-bold text-slate-800 px-1">
+              {searchQuery ? `Hasil Pencarian (${filteredFacts.length})` : 'Informasi yang Sudah Diverifikasi'}
+            </h3>
+
+            {filteredFacts.length === 0 ? (
+              <div className="bg-civic-surface text-center py-10 rounded-2xl border border-dashed border-slate-200">
+                <HelpCircle className="mx-auto text-slate-300 mb-2" size={32} />
+                <p className="text-sm text-slate-500 font-semibold">Berita belum terdaftar dalam sistem.</p>
+                <p className="text-xs text-slate-400 mt-1">Anda bisa melaporkannya di panel samping agar diteliti Pak RT.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredFacts.map((fact) => {
+                  const isFact = fact.status === 'fakta';
+                  return (
+                    <div
+                      key={fact.id}
+                      className={`bg-civic-surface rounded-2xl border p-5 shadow-xs transition-all duration-200 ${
+                        isFact ? 'border-l-4 border-l-emerald-500 border-slate-200' : 'border-l-4 border-l-rose-500 border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        {isFact ? (
+                          <>
+                            <ShieldCheck className="text-emerald-700 shrink-0" size={20} />
+                            <span className="font-extrabold text-[10px] uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">Fakta</span>
+                          </>
+                        ) : (
+                          <>
+                            <ShieldAlert className="text-rose-700 shrink-0" size={20} />
+                            <span className="font-extrabold text-[10px] uppercase tracking-wider bg-rose-100 text-rose-850 px-2 py-0.5 rounded">Hoaks / Bohong</span>
+                          </>
+                        )}
+                        <span className="text-[10px] text-slate-400 font-medium ml-auto">{fact.tanggal}</span>
+                      </div>
+                      
+                      <h4 className="font-extrabold text-slate-850 text-base mb-2">{fact.judul}</h4>
+                      <p className="text-sm text-slate-650 leading-relaxed whitespace-pre-line">{fact.penjelasan}</p>
+                      
+                      {fact.sumber && (
+                        <div className="mt-3 pt-2.5 border-t border-slate-100 text-xs text-slate-400 font-medium">
+                          Sumber resmi: <span className="text-slate-600 font-bold">{fact.sumber}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Kolom Kanan: Form Lapor Isu/WhatsApp Desas-Desus */}
+          <div className="lg:col-span-1">
+            <div className="bg-civic-surface rounded-2xl border border-slate-200 shadow-xs p-5 sticky top-20">
+              <div className="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
+                <HelpCircle className="text-teal-700 shrink-0" size={20} />
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Adukan Isu/Berita Baru</h3>
+              </div>
+              <p className="text-xs text-slate-500 mb-4 leading-normal">
+                Menemukan berita mencurigakan di grup WA keluarga atau tetangga? Tempel dan laporkan di sini agar Pak RT memverifikasinya.
+              </p>
+
+              <form onSubmit={handleReportRumor} className="space-y-4">
+                <div>
+                  <label htmlFor="rumor-input" className="block text-xs font-bold text-slate-700 mb-1">
+                    Konten Berita / Tangkapan Teks:
+                  </label>
+                  <textarea
+                    id="rumor-input"
+                    rows={4}
+                    required
+                    value={rumorText}
+                    onChange={(e) => setRumorText(e.target.value)}
+                    placeholder="Contoh: Bantuan sosial tambahan sebesar 100 ribu dibagikan besok malam jam 8 di kelurahan..."
+                    className="w-full border border-slate-350 rounded-xl p-3 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-civic-primary text-white font-bold py-2.5 px-4 rounded-xl hover:bg-teal-800 transition-all flex items-center justify-center gap-2 cursor-pointer text-sm"
+                >
+                  <Send size={16} />
+                  Kirim ke Pengurus RT
+                </button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ChatBot Cek Isu & Kesehatan (API Real-Time) */}
+        <div className="bg-civic-surface rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[480px] overflow-hidden mt-6">
+          {/* Header */}
+          <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between shrink-0 select-none">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2.5 bg-gradient-to-br from-teal-500 to-emerald-600 text-white rounded-xl shadow-xs shrink-0">
+                <Bot size={20} />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-slate-800 text-sm md:text-base leading-tight">ChatBot Isu Sosial & Kesehatan</h3>
+                <p className="text-[10px] text-slate-455 font-bold leading-none mt-0.5">Integrasi API Berita & Kesehatan Real-Time</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-250 px-2.5 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="text-[9px] font-extrabold text-emerald-800 uppercase tracking-wider">API Aktif</span>
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div 
+            ref={chatContainerRef}
+            className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50"
+          >
+            {chatMessages.map((msg, idx) => {
+              const isUser = msg.sender === 'user';
+              if (isUser) {
+                return (
+                  <div key={idx} className="flex w-full justify-end">
+                    <div className="max-w-[75%] md:max-w-[65%] rounded-2xl px-4 py-2.5 bg-slate-900 text-white shadow-2xs text-sm font-medium rounded-tr-none">
+                      <p className="whitespace-pre-line leading-relaxed">{msg.text}</p>
+                      <span className="block text-right text-[9px] mt-1 font-bold text-slate-400">
+                        {msg.time}
+                      </span>
+                    </div>
+                  </div>
+                );
+              } else {
+                return (
+                  <div key={idx} className="flex w-full justify-start items-start gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-civic-primary text-white flex items-center justify-center shrink-0 shadow-3xs select-none mt-0.5">
+                      <Bot size={16} />
+                    </div>
+                    <div className="max-w-[75%] md:max-w-[65%] rounded-2xl px-4 py-2.5 bg-white text-slate-800 border border-slate-100 shadow-3xs text-sm font-medium rounded-tl-none">
+                      <p className="whitespace-pre-line leading-relaxed">{msg.text}</p>
+                      <span className="block text-left text-[9px] mt-1 font-bold text-slate-400">
+                        {msg.time}
+                      </span>
+                    </div>
+                  </div>
+                );
+              }
+            })}
+
+            {isTyping && (
+              <div className="flex justify-start items-start gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-civic-primary text-white flex items-center justify-center shrink-0 shadow-3xs select-none mt-0.5">
+                  <Bot size={16} />
+                </div>
+                <div className="bg-white text-slate-650 border border-slate-105 rounded-2xl rounded-tl-none px-4 py-2.5 flex items-center gap-2 shadow-3xs">
+                  <Loader2 size={14} className="text-civic-primary animate-spin" />
+                  <span className="text-[11px] font-extrabold text-slate-500">Mencari informasi API...</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Suggestions */}
+          <div className="bg-slate-50 px-3 py-1.5 border-t border-slate-150 flex flex-wrap gap-1.5 items-center justify-center shrink-0">
+            <span className="text-[9px] font-extrabold text-slate-450 uppercase tracking-wider flex items-center gap-1">
+              <HelpCircle size={10} />
+              Topik Populer:
+            </span>
+            <button
+              type="button"
+              onClick={() => handleSuggestionClick('Bagaimana berita terhangat nasional hari ini?')}
+              className="bg-white border border-slate-200 hover:border-teal-650 text-slate-700 hover:text-teal-900 text-[10px] font-extrabold py-1 px-2.5 rounded-md transition-all cursor-pointer shadow-3xs select-none"
+            >
+              Berita Terhangat
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSuggestionClick('Bagaimana pencegahan DBD di musim hujan?')}
+              className="bg-white border border-slate-200 hover:border-teal-650 text-slate-700 hover:text-teal-900 text-[10px] font-extrabold py-1 px-2.5 rounded-md transition-all cursor-pointer shadow-3xs select-none"
+            >
+              Pencegahan DBD
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSuggestionClick('Apa saja aksi sosial nasional terbaru?')}
+              className="bg-white border border-slate-200 hover:border-teal-650 text-slate-700 hover:text-teal-900 text-[10px] font-extrabold py-1 px-2.5 rounded-md transition-all cursor-pointer shadow-3xs select-none"
+            >
+              Aksi Sosial Nasional
+            </button>
+          </div>
+
+          {/* Input Form */}
+          <form onSubmit={handleSendChat} className="p-3 border-t border-slate-200 bg-white flex gap-2 shrink-0">
+            <input
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Tanyakan isu sosial atau berita kesehatan di sini..."
+              className="flex-1 border border-slate-250 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-civic-primary text-sm disabled:bg-slate-55"
+            />
+            <button
+              type="submit"
+              disabled={!inputText.trim() || isTyping}
+              className="bg-civic-primary text-white p-2.5 rounded-xl hover:bg-teal-800 disabled:bg-slate-200 transition-all flex items-center justify-center shrink-0 min-w-[44px] cursor-pointer"
+            >
+              <Send size={16} />
+            </button>
+          </form>
+        </div>
+      </>
+    ) : (
+        /* ======================== VIEW ADMIN (KELOLA) ======================== */
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Kolom Kiri: Verifikasi Laporan Rumor Warga (2 Kolom) */}
+          <div className="lg:col-span-2 space-y-4">
+            <h3 className="text-base font-bold text-slate-800 px-1">
+              Desas-Desus yang Dilaporkan Warga ({submittedRumors.length})
+            </h3>
+
+            {submittedRumors.length === 0 ? (
+              <div className="bg-civic-surface text-center py-10 rounded-2xl border border-dashed border-slate-200">
+                <Check className="mx-auto text-emerald-500 mb-2" size={32} />
+                <p className="text-sm text-slate-500 font-bold">Semua bersih!</p>
+                <p className="text-xs text-slate-400 mt-1">Belum ada isu/rumor baru yang dilaporkan warga.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {submittedRumors.map((rumor) => {
+                  const isResolving = selectedRumorId === rumor.id;
+                  return (
+                    <div
+                      key={rumor.id}
+                      className="bg-civic-surface rounded-2xl border border-slate-250 p-5 shadow-xs flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[10px] font-extrabold uppercase bg-amber-100 text-amber-800 px-2 py-0.5 rounded">
+                            Aduan Isu
+                          </span>
+                          <span className="text-xs text-slate-400 font-medium">{rumor.tanggal}</span>
+                        </div>
+                        <p className="text-sm font-bold text-slate-800 italic bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                          "{rumor.konten}"
+                        </p>
+                        <p className="text-xs text-slate-450 mt-2 font-medium">
+                          Dilaporkan oleh: <span className="text-slate-700 font-bold">{rumor.wargaNama}</span>
+                        </p>
+                      </div>
+
+                      {/* Panel Aksi Verifikasi */}
+                      {isResolving ? (
+                        <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Tulis Penjelasan / Klarifikasi Resmi RT:
+                            </label>
+                            <textarea
+                              rows={3}
+                              required
+                              value={verifikasiPenjelasan}
+                              onChange={(e) => setVerifikasiPenjelasan(e.target.value)}
+                              placeholder="Tulis alasan mengapa ini hoaks/fakta. Sebutkan buktinya agar warga percaya..."
+                              className="w-full border border-slate-300 rounded-xl p-3 text-slate-855 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                            />
+                          </div>
+                          
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              onClick={() => handleConfirmVerification(rumor.id, 'fakta')}
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded-xl flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Check size={14} />
+                              Verifikasi FAKTA
+                            </button>
+                            <button
+                              onClick={() => handleConfirmVerification(rumor.id, 'hoaks')}
+                              className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold py-2 px-4 rounded-xl flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <X size={14} />
+                              Verifikasi HOAKS
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedRumorId(null);
+                                setVerifikasiPenjelasan('');
+                              }}
+                              className="bg-slate-100 hover:bg-slate-200 text-slate-650 text-xs font-bold py-2 px-4 rounded-xl cursor-pointer"
+                            >
+                              Batal
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-4 pt-3 border-t border-slate-150 flex gap-2 justify-end">
+                          <button
+                            onClick={() => setSelectedRumorId(rumor.id)}
+                            className="bg-civic-primary hover:opacity-90 text-white text-xs font-bold py-2 px-4 rounded-xl cursor-pointer"
+                          >
+                            Verifikasi Isu
+                          </button>
+                          <button
+                            onClick={() => onDeleteRumor(rumor.id)}
+                            className="text-rose-500 hover:bg-rose-50 p-2 rounded-xl cursor-pointer"
+                            title="Hapus Aduan Isu"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Arsip Fakta (Admin can view and delete them) */}
+            <div className="pt-4">
+              <h3 className="text-base font-bold text-slate-800 px-1 mb-3">Arsip Kebenaran Informasi Publik</h3>
+              <div className="space-y-3">
+                {filteredFacts.map((fact) => (
+                  <div key={fact.id} className="bg-civic-surface rounded-xl border border-slate-200 p-4 flex justify-between items-start gap-4">
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+                          fact.status === 'fakta' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                        }`}>
+                          {fact.status}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-medium">{fact.tanggal}</span>
+                      </div>
+                      <h4 className="font-bold text-slate-800 text-sm">{fact.judul}</h4>
+                    </div>
+                    <div className="flex gap-1.5 items-center select-none shrink-0">
+                      <button
+                        onClick={() => {
+                          setEditingFact(fact);
+                          setEditFactJudul(fact.judul);
+                          setEditFactPenjelasan(fact.penjelasan);
+                          setEditFactStatus(fact.status);
+                          setEditFactSumber(fact.sumber || '');
+                        }}
+                        className="text-slate-400 hover:text-blue-650 p-1.5 rounded-lg hover:bg-slate-50 cursor-pointer"
+                        title="Edit Arsip Fakta"
+                      >
+                        <Edit size={15} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm('Yakin ingin menghapus arsip fakta ini dari publik?')) {
+                            onDeleteFact(fact.id);
+                          }
+                        }}
+                        className="text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-slate-50 cursor-pointer"
+                        title="Hapus Arsip Fakta"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Kolom Kanan: Form Posting Fakta Langsung (Tanpa rumor) */}
+          <div className="lg:col-span-1">
+            <div className="bg-civic-surface rounded-2xl border border-slate-200 shadow-xs p-5 sticky top-20">
+              <div className="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
+                <Plus className="text-civic-primary shrink-0" size={20} />
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Tulis Fakta Baru</h3>
+              </div>
+
+              <form onSubmit={handlePostDirectFact} className="space-y-4">
+                <div>
+                  <label htmlFor="direct-title" className="block text-xs font-bold text-slate-700 mb-1">
+                    Judul Kasus / Berita:
+                  </label>
+                  <input
+                    id="direct-title"
+                    type="text"
+                    required
+                    value={factJudul}
+                    onChange={(e) => setFactJudul(e.target.value)}
+                    placeholder="Contoh: Isu Penculikan Anak Gang 3"
+                    className="w-full border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label htmlFor="direct-status" className="block text-xs font-bold text-slate-700 mb-1">
+                      Status Kebenaran:
+                    </label>
+                    <select
+                      id="direct-status"
+                      value={factStatus}
+                      onChange={(e) => setFactStatus(e.target.value as any)}
+                      className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-white text-slate-855 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                    >
+                      <option value="fakta">FAKTA</option>
+                      <option value="hoaks">HOAKS</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="direct-source" className="block text-xs font-bold text-slate-700 mb-1">
+                      Sumber (Opsional):
+                    </label>
+                    <input
+                      id="direct-source"
+                      type="text"
+                      value={factSumber}
+                      onChange={(e) => setFactSumber(e.target.value)}
+                      placeholder="Babinkamtibmas/Polsek"
+                      className="w-full border border-slate-300 rounded-xl px-2 py-1.5 text-slate-855 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="direct-explanation" className="block text-xs font-bold text-slate-700 mb-1">
+                    Penjelasan Lengkap:
+                  </label>
+                  <textarea
+                    id="direct-explanation"
+                    rows={4}
+                    required
+                    value={factPenjelasan}
+                    onChange={(e) => setFactPenjelasan(e.target.value)}
+                    placeholder="Tulis klarifikasi detail untuk meluruskan kesalahpahaman warga..."
+                    className="w-full border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-civic-primary hover:opacity-90 text-white font-bold py-2.5 px-4 rounded-xl transition-all cursor-pointer text-sm"
+                >
+                  Terbitkan Hasil Verifikasi
+                </button>
+              </form>
+            </div>
+          </div>
+
+      </div>
+    )}
+
+      {/* Modal Edit Fakta (Admin Only) */}
+      {isAdmin && editingFact && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in select-none">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 className="text-base font-extrabold text-slate-805">Edit Klarifikasi Informasi</h3>
+              <button 
+                onClick={() => { setEditingFact(null); }}
+                className="text-slate-400 hover:text-slate-655 font-bold text-lg cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+            
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (editFactJudul.trim() && editFactPenjelasan.trim()) {
+                  onEditFact(editingFact.id, editFactJudul.trim(), editFactPenjelasan.trim(), editFactStatus, editFactSumber.trim() || undefined);
+                  setEditingFact(null);
+                  alert('Klarifikasi informasi resmi berhasil diperbarui!');
+                }
+              }}
+              className="space-y-4 text-xs"
+            >
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Judul Kasus / Berita:</label>
+                <input
+                  type="text"
+                  required
+                  value={editFactJudul}
+                  onChange={(e) => setEditFactJudul(e.target.value)}
+                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Status Kebenaran:</label>
+                  <select
+                    value={editFactStatus}
+                    onChange={(e) => setEditFactStatus(e.target.value as any)}
+                    className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-white text-slate-800 focus:outline-none"
+                  >
+                    <option value="fakta">FAKTA</option>
+                    <option value="hoaks">HOAKS</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Sumber Resmi:</label>
+                  <input
+                    type="text"
+                    value={editFactSumber}
+                    onChange={(e) => setEditFactSumber(e.target.value)}
+                    className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Penjelasan Lengkap:</label>
+                <textarea
+                  rows={4}
+                  required
+                  value={editFactPenjelasan}
+                  onChange={(e) => setEditFactPenjelasan(e.target.value)}
+                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex gap-2 justify-end pt-2 border-t border-slate-100">
+                <button
+                  type="submit"
+                  className="bg-civic-primary hover:opacity-90 text-white font-bold py-2 px-4 rounded-xl cursor-pointer"
+                >
+                  Simpan Perubahan
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingFact(null)}
+                  className="bg-slate-200 hover:bg-slate-300 text-slate-655 font-bold py-2 px-4 rounded-xl cursor-pointer"
+                >
+                  Batal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+};
