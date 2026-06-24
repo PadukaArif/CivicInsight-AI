@@ -9,6 +9,7 @@ export interface StatistikViewProps {
   onVoteComfort: (choice: 'sangat_nyaman' | 'biasa_saja' | 'cukup_khawatir') => void;
   aduanList: any[];
   poinWarga: number;
+  approvedUsers?: any[];
 }
 
 export const StatistikView: React.FC<StatistikViewProps> = ({
@@ -18,6 +19,7 @@ export const StatistikView: React.FC<StatistikViewProps> = ({
   onVoteComfort,
   aduanList,
   poinWarga,
+  approvedUsers = [],
 }) => {
   // 1. hitung statistik pekerjaan secara dinamis dari database KK
   const pekerjaanCounts = React.useMemo(() => {
@@ -62,9 +64,50 @@ export const StatistikView: React.FC<StatistikViewProps> = ({
     return pollResults.sangat_nyaman + pollResults.biasa_saja + pollResults.cukup_khawatir;
   }, [pollResults]);
 
-  // 4. Analisis Kesejahteraan Gemini AI (Simulasi dinamika teks AI)
+  // 4. rata-rata poin warga dari database terdaftar
+  const averagePoints = React.useMemo(() => {
+    if (!approvedUsers || approvedUsers.length === 0) return 0;
+    const sum = approvedUsers.reduce((acc, curr) => acc + (curr.points ?? 0), 0);
+    return Math.round(sum / approvedUsers.length);
+  }, [approvedUsers]);
+
+  // 5. analisis sentimen psikologis dinamis dari aduanList
+  const sentimentStats = React.useMemo(() => {
+    const total = aduanList.length;
+    if (total === 0) {
+      return { positif: 100, netral: 0, khawatir: 0 };
+    }
+    const selesai = aduanList.filter(a => a.status === 'Selesai').length;
+    const diproses = aduanList.filter(a => a.status === 'Diproses').length;
+    const terkirim = aduanList.filter(a => a.status === 'Terkirim').length;
+    return {
+      positif: Math.round((selesai / total) * 100),
+      netral: Math.round((diproses / total) * 100),
+      khawatir: Math.round((terkirim / total) * 100)
+    };
+  }, [aduanList]);
+
+  // 6. tingkat partisipasi kuis dinamis
+  const quizParticipation = React.useMemo(() => {
+    if (!approvedUsers || approvedUsers.length === 0) return 0;
+    let completedCount = 0;
+    approvedUsers.forEach(user => {
+      if (localStorage.getItem(`civic_smart_quiz_completed_${user.email}`) === 'true') {
+        completedCount++;
+      }
+    });
+    return Math.round((completedCount / approvedUsers.length) * 100);
+  }, [approvedUsers]);
+
+  // 7. partisipasi aksi sosial dinamis
+  const socialParticipation = React.useMemo(() => {
+    if (!households || households.length === 0) return 0;
+    const withMembers = households.filter(h => h.members.length > 1).length;
+    return Math.round((withMembers / households.length) * 100);
+  }, [households]);
+
+  // 8. Analisis Kesejahteraan Gemini AI (Tanpa asterisks)
   const aiAnalisisKesejahteraan = React.useMemo(() => {
-    const jobKeys = Object.keys(pekerjaanCounts.counts);
     const swastaCount = pekerjaanCounts.counts['Karyawan Swasta'] || 0;
     const wiraswastaCount = pekerjaanCounts.counts['Wiraswasta'] || 0;
     const pnsCount = pekerjaanCounts.counts['PNS'] || 0;
@@ -72,19 +115,19 @@ export const StatistikView: React.FC<StatistikViewProps> = ({
     const totalVotes = totalPollVotes || 1;
     const khawatirPercent = Math.round((pollResults.cukup_khawatir / totalVotes) * 100);
 
-    let summary = `Berdasarkan analisis kognitif AI terhadap data demografi pekerjaan warga RT 04 (total ${pekerjaanCounts.total} warga) dan poin partisipasi sosial (rata-rata ${poinWarga} poin):\n\n`;
+    let summary = `Berdasarkan analisis kognitif AI terhadap data demografi pekerjaan warga RT 04 (total ${pekerjaanCounts.total} warga) dan poin partisipasi sosial (rata-rata ${averagePoints} poin):\n\n`;
 
     if (khawatirPercent > 20) {
-      summary += `🚨 **Kesehatan Lingkungan Butuh Perhatian:** Ditemukan ${khawatirPercent}% warga menyatakan Cukup Khawatir terhadap lingkungan minggu ini. Analisis korelasi menunjukkan kekhawatiran ini berkaitan dengan kebersihan saluran air menjelang musim hujan dan frekuensi pengangkutan sampah.\n\n`;
+      summary += `🚨 Kesehatan Lingkungan Butuh Perhatian: Ditemukan ${khawatirPercent}% warga menyatakan Cukup Khawatir terhadap lingkungan minggu ini. Analisis korelasi menunjukkan kekhawatiran ini berkaitan dengan kebersihan saluran air menjelang musim hujan dan frekuensi pengangkutan sampah.\n\n`;
     } else {
-      summary += `✨ **Kondisi Lingkungan Kondusif:** Sebesar ${Math.round(((pollResults.sangat_nyaman + pollResults.biasa_saja) / totalVotes) * 100)}% warga menilai lingkungan minggu ini dalam kondisi Nyaman/Biasa saja. Hal ini selaras dengan tingginya partisipasi warga dalam aksi gotong royong.\n\n`;
+      summary += `✨ Kondisi Lingkungan Kondusif: Sebesar ${Math.round(((pollResults.sangat_nyaman + pollResults.biasa_saja) / totalVotes) * 100)}% warga menilai lingkungan minggu ini dalam kondisi Nyaman/Biasa saja. Hal ini selaras dengan tingginya partisipasi warga dalam aksi gotong royong.\n\n`;
     }
 
-    summary += `💼 **Peta Sektor Pekerjaan:** Mayoritas warga bekerja di sektor formal (Karyawan Swasta: ${swastaCount}, PNS: ${pnsCount}) dan Wirausaha (${wiraswastaCount}). Struktur ini memberikan stabilitas ekonomi mandiri yang sangat baik, sehingga menekan angka resiko kemiskinan di area RT 04 ke tingkat terendah.\n\n`;
-    summary += `💡 **Rekomendasi Kebijakan RT:** Pengurus disarankan mempertahankan program iuran kas sampah rutin, meningkatkan patroli malam (ronda) untuk meredam kekhawatiran warga, serta memperluas materi Smart Quiz untuk mengedukasi warga tentang penanggulangan wabah DBD pancaroba.`;
+    summary += `💼 Peta Sektor Pekerjaan: Mayoritas warga bekerja di sektor formal (Karyawan Swasta: ${swastaCount}, PNS: ${pnsCount}) dan Wirausaha (${wiraswastaCount}). Struktur ini memberikan stabilitas ekonomi mandiri yang sangat baik, sehingga menekan angka resiko kemiskinan di area RT 04 ke tingkat terendah.\n\n`;
+    summary += `💡 Rekomendasi Kebijakan RT: Pengurus disarankan mempertahankan program iuran kas sampah rutin, meningkatkan patroli malam (ronda) untuk meredam kekhawatiran warga, serta memperluas materi Smart Quiz untuk mengedukasi warga tentang penanggulangan wabah DBD pancaroba.`;
 
     return summary;
-  }, [pekerjaanCounts, pollResults, totalPollVotes, poinWarga]);
+  }, [pekerjaanCounts, pollResults, totalPollVotes, averagePoints]);
 
   return (
     <div className="space-y-6">
@@ -230,7 +273,7 @@ export const StatistikView: React.FC<StatistikViewProps> = ({
 
             <div className="flex items-start gap-2 p-3 bg-blue-50/50 border border-blue-100 rounded-xl text-[11px] text-slate-600 leading-snug">
               <CheckCircle2 size={16} className="text-blue-600 shrink-0 mt-0.5" />
-              <span>Status wilayah RT 04: **Sangat Aman**. Mayoritas warga berada pada tingkat risiko rendah. Bantuan sosial tepat sasaran siap disalurkan jika terjadi perubahan status.</span>
+              <span>Status wilayah RT 04: Sangat Aman. Mayoritas warga berada pada tingkat risiko rendah. Bantuan sosial tepat sasaran siap disalurkan jika terjadi perubahan status.</span>
             </div>
           </div>
 
@@ -247,41 +290,41 @@ export const StatistikView: React.FC<StatistikViewProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between items-center text-xs">
                 <span className="text-slate-600 font-bold flex items-center gap-1"><Smile size={12} className="text-emerald-500" /> Positif / Tenang</span>
-                <span className="font-extrabold text-slate-800">72%</span>
+                <span className="font-extrabold text-slate-800">{sentimentStats.positif}%</span>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-slate-600 font-bold flex items-center gap-1"><Meh size={12} className="text-blue-500" /> Netral</span>
-                <span className="font-extrabold text-slate-800">20%</span>
+                <span className="font-extrabold text-slate-800">{sentimentStats.netral}%</span>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-slate-600 font-bold flex items-center gap-1"><Frown size={12} className="text-rose-500" /> Khawatir / Cemas</span>
-                <span className="font-extrabold text-slate-800">8%</span>
+                <span className="font-extrabold text-slate-800">{sentimentStats.khawatir}%</span>
               </div>
             </div>
           </div>
 
-          {/* F. Smart Quiz & Aksi Sosial Nasional */}
+          {/* F. Smart Quiz & Aksi Sosial */}
           <div className="bg-civic-surface rounded-2xl border border-slate-200 shadow-xs p-5">
             <h4 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2 mb-3 pb-2 border-b border-slate-100 select-none">
               <Award size={16} className="text-amber-600" />
               Smart Quiz & Aksi Sosial
             </h4>
             <p className="text-[11px] text-slate-500 mb-4 leading-normal">
-              Indikator partisipasi warga dalam aksi sosial nasional dan pengerjaan kuis edukasi.
+              Indikator partisipasi warga dalam aksi sosial dan pengerjaan kuis edukasi.
             </p>
 
             <div className="space-y-3 select-none">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-600 font-semibold">Tingkat Partisipasi Kuis</span>
-                <span className="font-extrabold text-slate-800">84%</span>
+                <span className="font-extrabold text-slate-800">{quizParticipation}%</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-600 font-semibold">Partisipasi Aksi Sosial Nasional</span>
-                <span className="font-extrabold text-slate-800">65%</span>
+                <span className="text-slate-600 font-semibold">Partisipasi Aksi Sosial</span>
+                <span className="font-extrabold text-slate-800">{socialParticipation}%</span>
               </div>
               <div className="flex items-center justify-between text-xs pt-1.5 border-t border-slate-100">
                 <span className="text-slate-600 font-bold">Poin Rata-Rata Keaktifan</span>
-                <span className="font-extrabold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">{poinWarga} Poin</span>
+                <span className="font-extrabold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">{averagePoints} Poin</span>
               </div>
             </div>
           </div>

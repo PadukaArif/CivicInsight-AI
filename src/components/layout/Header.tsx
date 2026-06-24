@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, ChevronDown, Home, Sparkles, ShieldCheck, Megaphone, Settings, ClipboardList, ShieldAlert, Bot, TrendingUp, MapPin } from 'lucide-react';
+import { Menu, ChevronDown, Home, Sparkles, ShieldCheck, Megaphone, Settings, ClipboardList, ShieldAlert, Bot, TrendingUp, MapPin, LogOut } from 'lucide-react';
 import { ExpandableTabs } from '../ui/expandable-tabs';
 import logoImg from '../../logo.png';
 
@@ -14,6 +14,7 @@ export interface HeaderProps {
   currentTabTitle: string; // Judul modul aktif saat ini
   currentTab: string; // Tab aktif saat ini untuk menyoroti link di navbar desktop
   onTabChange: (tabId: string) => void; // Callback ketika tab diubah dari navbar desktop
+  onLogout: () => void; // Callback ketika user log out
 }
 
 /**
@@ -65,6 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
   currentTabTitle,
   currentTab,
   onTabChange,
+  onLogout,
 }) => {
   // Ambil daftar menu horizontal sesuai peran aktif
   const desktopMenuItems = isAdmin ? adminMenuItems : wargaMenuItems;
@@ -165,6 +167,15 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {isAdmin ? 'P' : 'W'}
           </div>
+
+          {/* Tombol Keluar / Logout */}
+          <button
+            onClick={onLogout}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer shrink-0"
+            title="Keluar dari Portal"
+          >
+            <LogOut size={16} />
+          </button>
         </div>
       </div>
     </header>

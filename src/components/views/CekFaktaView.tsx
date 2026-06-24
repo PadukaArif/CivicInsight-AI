@@ -86,13 +86,13 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
       let reply = '';
 
       if (lower.includes('berita') || lower.includes('isu') || lower.includes('sosial') || lower.includes('negara')) {
-        reply = '📰 **[API BERITA REAL-TIME]**\n- **Insentif UMKM:** Pemerintah memperluas jangkauan subsidi KUR bagi usaha mikro.\n- **Kondisi Sosial:** Kampanye kepedulian sampah plastik nasional mulai diterapkan di pasar tradisional.\n- **Ekonomi:** Inflasi nasional terkendali di angka 2.8%, menjaga harga kebutuhan pokok tetap stabil di tingkat pasar.';
+        reply = '📰 [API BERITA REAL-TIME]\n- Insentif UMKM: Pemerintah memperluas jangkauan subsidi KUR bagi usaha mikro.\n- Kondisi Sosial: Kampanye kepedulian sampah plastik nasional mulai diterapkan di pasar tradisional.\n- Ekonomi: Inflasi nasional terkendali di angka 2.8%, menjaga harga kebutuhan pokok tetap stabil di tingkat pasar.';
       } else if (lower.includes('sehat') || lower.includes('dbd') || lower.includes('virus') || lower.includes('medis') || lower.includes('nyamuk') || lower.includes('sakit')) {
-        reply = '🏥 **[API KESEHATAN REAL-TIME]**\n- **Waspada DBD:** Lonjakan kasus demam berdarah terdeteksi di beberapa wilayah perkotaan akibat curah hujan tinggi.\n- **Pencegahan:** Lakukan 3M Plus secara rutin. Gunakan lotion anti-nyamuk saat beraktivitas di luar.\n- **Kesehatan Mental:** Kementerian Kesehatan meluncurkan hotline konseling psikologis gratis 24 jam di nomor 119 ext 8.';
+        reply = '🏥 [API KESEHATAN REAL-TIME]\n- Waspada DBD: Lonjakan kasus demam berdarah terdeteksi di beberapa wilayah perkotaan akibat curah hujan tinggi.\n- Pencegahan: Lakukan 3M Plus secara rutin. Gunakan lotion anti-nyamuk saat beraktivitas di luar.\n- Kesehatan Mental: Kementerian Kesehatan meluncurkan hotline konseling psikologis gratis 24 jam di nomor 119 ext 8.';
       } else if (lower.includes('konsultasi') || lower.includes('bantuan') || lower.includes('panduan')) {
-        reply = 'ℹ️ **[PANDUAN SISTEM PORTAL]**\nUntuk bantuan administrasi surat pengantar RT, silakan gunakan menu **Konsultasi AI** di navigasi atas. Jika ingin melaporkan infrastruktur rusak, gunakan menu **Lapor Aduan**. Chatbot ini khusus untuk memantau berita & kesehatan nasional.';
+        reply = 'ℹ️ [PANDUAN SISTEM PORTAL]\nUntuk bantuan administrasi surat pengantar RT, silakan gunakan menu Konsultasi AI di navigasi atas. Jika ingin melaporkan infrastruktur rusak, gunakan menu Lapor Aduan. Chatbot ini khusus untuk memantau berita & kesehatan nasional.';
       } else {
-        reply = '🤖 **[API INTEGRASI BERITA & KESEHATAN]**\nTerima kasih atas pertanyaan Anda. Berdasarkan penelusuran API berita dan kesehatan:\n- Tidak ditemukan isu krusial baru mengenai kata kunci tersebut hari ini.\n- Secara umum, kondisi nasional terpantau aman dan terkendali.\n\nCobalah tanyakan tentang **"berita terbaru"**, **"isu sosial"**, atau **"pencegahan DBD"** untuk informasi yang lebih spesifik.';
+        reply = '🤖 [API INTEGRASI BERITA & KESEHATAN]\nTerima kasih atas pertanyaan Anda. Berdasarkan penelusuran API berita dan kesehatan:\n- Tidak ditemukan isu krusial baru mengenai kata kunci tersebut hari ini.\n- Secara umum, kondisi nasional terpantau aman dan terkendali.\n\nCobalah tanyakan tentang "berita terbaru", "isu sosial", atau "pencegahan DBD" untuk informasi yang lebih spesifik.';
       }
 
       const aiTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });

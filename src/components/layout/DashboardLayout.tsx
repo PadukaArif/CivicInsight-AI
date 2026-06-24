@@ -15,6 +15,7 @@ export interface DashboardLayoutProps {
   isAdmin: boolean; // Menunjukkan apakah peran saat ini adalah Admin/Pengurus
   activeRtRw: string; // RT/RW terpilih saat ini
   onRtRwChange: (value: string) => void; // Callback ketika pilihan RT/RW diubah
+  onLogout: () => void; // Callback ketika user keluar
 }
 
 /**
@@ -42,6 +43,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   isAdmin,
   activeRtRw,
   onRtRwChange,
+  onLogout,
 }) => {
   // State lokal untuk melacak buka-tutup Sidebar di layar mobile
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
@@ -78,6 +80,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         isOpen={isSidebarOpen}
         onClose={closeSidebar}
         isAdmin={isAdmin}
+        onLogout={onLogout}
       />
 
       {/* Area Utama: Terdiri dari Header (Atas) dan Area Konten (Bawah) */}
@@ -94,6 +97,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           currentTabTitle={pageTitle}
           currentTab={currentTab}
           onTabChange={onTabChange}
+          onLogout={onLogout}
         />
 
         {/* 
