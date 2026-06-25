@@ -1,11 +1,13 @@
 import { serve } from "bun";
 import index from "./index.html";
 
+const BACKEND_URL = process.env.VITE_API_URL || "http://localhost:4000";
+
 const server = serve({
   routes: {
     "/news/*": async (req) => {
       const url = new URL(req.url);
-      const backendUrl = `http://localhost:4000${url.pathname}${url.search}`;
+      const backendUrl = `${BACKEND_URL}${url.pathname}${url.search}`;
       try {
         const res = await fetch(backendUrl, {
           method: req.method,
@@ -18,7 +20,7 @@ const server = serve({
     },
     "/health/*": async (req) => {
       const url = new URL(req.url);
-      const backendUrl = `http://localhost:4000${url.pathname}${url.search}`;
+      const backendUrl = `${BACKEND_URL}${url.pathname}${url.search}`;
       try {
         const res = await fetch(backendUrl, {
           method: req.method,
