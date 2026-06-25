@@ -30,12 +30,14 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({
 
   // Sync completed kuis status per user
   React.useEffect(() => {
+    setQuizStep(0);
+    setQuizAnswers({});
+    setQuizScore(0);
+    
     if (currentUser && currentUser !== 'admin') {
-      const completed = localStorage.getItem(`civic_smart_quiz_completed_${currentUser.email}`) === 'true';
+      const emailKey = currentUser.email || '';
+      const completed = localStorage.getItem(`civic_smart_quiz_completed_${emailKey}`) === 'true';
       setQuizCompleted(completed);
-      setQuizStep(0);
-      setQuizAnswers({});
-      setQuizScore(0);
     } else {
       setQuizCompleted(false);
     }
@@ -63,12 +65,13 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({
                 min="1"
                 value={pointsPerQuestion}
                 onChange={(e) => {
-                  const val = parseInt(e.target.value, 10);
+                  const val = parseInt(e.target.value, 15);
                   if (!isNaN(val) && val > 0) {
                     onUpdatePointsPerQuestion?.(val);
                   }
                 }}
-                className="w-full border border-slate-350 rounded-xl px-3 py-2 text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full border border-slate-350 rounded-xl px-3 py-2 text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 bg-slate-100"
+                autoComplete="off"
               />
             </div>
           </div>
@@ -116,6 +119,7 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({
           
           {/* Form Tambah Soal Baru */}
           <form
+            autoComplete="off"
             onSubmit={(e) => {
               e.preventDefault();
               const form = e.currentTarget;
@@ -153,7 +157,8 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({
               type="text"
               placeholder="Teks Pertanyaan"
               required
-              className="w-full border border-slate-355 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full border border-slate-355 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-slate-100"
+              autoComplete="off"
             />
             
             <div className="space-y-1.5 pl-2 border-l-2 border-amber-300">
@@ -162,21 +167,24 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({
                 type="text"
                 placeholder="Opsi A"
                 required
-                className="w-full border border-slate-250 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none"
+                className="w-full border border-slate-250 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none bg-slate-100"
+                autoComplete="off"
               />
               <input
                 name="q-opt-b"
                 type="text"
                 placeholder="Opsi B"
                 required
-                className="w-full border border-slate-250 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none"
+                className="w-full border border-slate-250 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none bg-slate-100"
+                autoComplete="off"
               />
               <input
                 name="q-opt-c"
                 type="text"
                 placeholder="Opsi C"
                 required
-                className="w-full border border-slate-250 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none"
+                className="w-full border border-slate-250 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none bg-slate-100"
+                autoComplete="off"
               />
             </div>
             
@@ -187,7 +195,7 @@ export const QuizWidget: React.FC<QuizWidgetProps> = ({
               <select
                 id="q-correct"
                 name="q-correct"
-                className="border border-slate-300 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                className="border border-slate-300 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-slate-100"
               >
                 <option value="A">A</option>
                 <option value="B">B</option>

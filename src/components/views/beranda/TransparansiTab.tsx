@@ -78,6 +78,7 @@ export const TransparansiTab: React.FC<TransparansiTabProps> = ({
               alert('Harap isi data transaksi dengan valid!');
             }
           }}
+          autoComplete="off"
           className="bg-slate-50 border border-slate-205 rounded-2xl p-4 mb-4 space-y-3.5 text-xs select-none shadow-3xs animate-fade-in"
         >
           <span className="block font-bold text-slate-800 text-xs">Pencatatan Transaksi Kas Baru</span>
@@ -90,7 +91,8 @@ export const TransparansiTab: React.FC<TransparansiTabProps> = ({
                 required
                 value={newTxTanggal}
                 onChange={(e) => setNewTxTanggal(e.target.value)}
-                className="w-full border border-slate-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none"
+                className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 focus:outline-none"
+                autoComplete="off"
               />
             </div>
             <div>
@@ -101,7 +103,8 @@ export const TransparansiTab: React.FC<TransparansiTabProps> = ({
                 required
                 value={newTxKeterangan}
                 onChange={(e) => setNewTxKeterangan(e.target.value)}
-                className="w-full border border-slate-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none"
+                className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 focus:outline-none"
+                autoComplete="off"
               />
             </div>
             <div>
@@ -109,7 +112,7 @@ export const TransparansiTab: React.FC<TransparansiTabProps> = ({
               <select
                 value={newTxJenis}
                 onChange={(e) => setNewTxJenis(e.target.value as any)}
-                className="w-full border border-slate-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none"
+                className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 focus:outline-none"
               >
                 <option value="pemasukan">Pemasukan (Kas Bertambah)</option>
                 <option value="pengeluaran">Pengeluaran (Kas Berkurang)</option>
@@ -123,7 +126,8 @@ export const TransparansiTab: React.FC<TransparansiTabProps> = ({
                 required
                 value={newTxJumlah}
                 onChange={(e) => setNewTxJumlah(e.target.value)}
-                className="w-full border border-slate-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none font-bold text-slate-800"
+                className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 focus:outline-none font-bold text-slate-800"
+                autoComplete="off"
               />
             </div>
           </div>
@@ -246,6 +250,7 @@ export const TransparansiTab: React.FC<TransparansiTabProps> = ({
                   alert('Harap isi data transaksi dengan valid!');
                 }
               }}
+              autoComplete="off"
               className="space-y-4 text-xs"
             >
               <div className="grid grid-cols-2 gap-3">
@@ -256,7 +261,8 @@ export const TransparansiTab: React.FC<TransparansiTabProps> = ({
                     required
                     value={editTxTanggal}
                     onChange={(e) => setEditTxTanggal(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                    className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none bg-slate-100"
+                    autoComplete="off"
                   />
                 </div>
                 <div>
@@ -264,7 +270,7 @@ export const TransparansiTab: React.FC<TransparansiTabProps> = ({
                   <select
                     value={editTxJenis}
                     onChange={(e) => setEditTxJenis(e.target.value as any)}
-                    className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-white text-slate-800 focus:outline-none"
+                    className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-slate-100 text-slate-800 focus:outline-none"
                   >
                     <option value="pemasukan">Pemasukan (Kas Bertambah)</option>
                     <option value="pengeluaran">Pengeluaran (Kas Berkurang)</option>
@@ -279,7 +285,8 @@ export const TransparansiTab: React.FC<TransparansiTabProps> = ({
                   required
                   value={editTxKeterangan}
                   onChange={(e) => setEditTxKeterangan(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none bg-slate-100"
+                  autoComplete="off"
                 />
               </div>
 
@@ -290,7 +297,8 @@ export const TransparansiTab: React.FC<TransparansiTabProps> = ({
                   required
                   value={editTxJumlah}
                   onChange={(e) => setEditTxJumlah(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 font-bold focus:outline-none"
+                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 font-bold focus:outline-none bg-slate-100"
+                  autoComplete="off"
                 />
               </div>
 

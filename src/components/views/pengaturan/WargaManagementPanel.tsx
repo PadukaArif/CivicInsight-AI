@@ -53,7 +53,8 @@ export const WargaManagementPanel: React.FC<WargaManagementPanelProps> = ({
                       const val = parseInt(e.target.value, 10);
                       setPointsInputs(prev => ({ ...prev, [user.id]: isNaN(val) ? 0 : val }));
                     }}
-                    className="w-20 border border-slate-300 rounded-l-lg px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    className="w-20 border border-slate-300 rounded-l-lg px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-slate-100"
+                    autoComplete="off"
                   />
                   <button
                     onClick={() => {

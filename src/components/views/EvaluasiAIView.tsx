@@ -16,6 +16,52 @@ export const EvaluasiAIView: React.FC<EvaluasiAIViewProps> = ({
   const [input, setInput] = React.useState('');
   const chatContainerRef = React.useRef<HTMLDivElement>(null);
 
+  const parseBoldAndLinks = (line: string) => {
+    const parts = line.split(/(\*\*|\*)/g);
+    let isBold = false;
+    return parts.map((part, idx) => {
+      if (part === '**' || part === '*') {
+        isBold = !isBold;
+        return null;
+      }
+      
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      if (urlRegex.test(part)) {
+        const subParts = part.split(urlRegex);
+        return (
+          <span key={idx}>
+            {subParts.map((subPart, subIdx) => {
+              if (urlRegex.test(subPart)) {
+                return (
+                  <a
+                    key={subIdx}
+                    href={subPart}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline font-bold break-all"
+                  >
+                    {subPart}
+                  </a>
+                );
+              }
+              return isBold ? <strong key={subIdx} className="font-extrabold text-slate-900">{subPart}</strong> : subPart;
+            })}
+          </span>
+        );
+      }
+
+      return isBold ? <strong key={idx} className="font-extrabold text-slate-900">{part}</strong> : part;
+    });
+  };
+
+  const renderMessageText = (text: string) => {
+    return text.split('\n').map((line, lineIdx) => (
+      <div key={lineIdx} className="min-h-[1.25rem]">
+        {parseBoldAndLinks(line)}
+      </div>
+    ));
+  };
+
   // Auto-scroll chat container on messages update
   React.useEffect(() => {
     if (chatContainerRef.current) {
@@ -46,7 +92,7 @@ export const EvaluasiAIView: React.FC<EvaluasiAIViewProps> = ({
           </div>
           <div>
             <h3 className="font-extrabold text-slate-800 text-sm md:text-base leading-tight">Asisten Evaluasi AI</h3>
-            <p className="text-[10px] text-slate-450 font-bold leading-none mt-0.5">Analisis Kinerja Layanan Publik & Data Bulanan</p>
+            <p className="text-[10px] text-slate-455 font-bold leading-none mt-0.5">Analisis Kinerja Layanan Publik & Data Bulanan</p>
           </div>
         </div>
 
@@ -67,7 +113,7 @@ export const EvaluasiAIView: React.FC<EvaluasiAIViewProps> = ({
             return (
               <div key={idx} className="flex w-full justify-end">
                 <div className="max-w-[75%] md:max-w-[65%] rounded-2xl px-4 py-2.5 bg-slate-900 text-white shadow-2xs text-sm font-medium rounded-tr-none">
-                  <p className="whitespace-pre-line leading-relaxed">{msg.text}</p>
+                  <div className="leading-relaxed">{renderMessageText(msg.text)}</div>
                   <span className="block text-right text-[9px] mt-1 font-bold text-slate-400">
                     {msg.time}
                   </span>
@@ -81,7 +127,7 @@ export const EvaluasiAIView: React.FC<EvaluasiAIViewProps> = ({
                   <Bot size={16} />
                 </div>
                 <div className="max-w-[75%] md:max-w-[65%] rounded-2xl px-4 py-2.5 bg-white text-slate-800 border border-slate-100 shadow-3xs text-sm font-medium rounded-tl-none">
-                  <p className="whitespace-pre-line leading-relaxed">{msg.text}</p>
+                  <div className="leading-relaxed">{renderMessageText(msg.text)}</div>
                   <span className="block text-left text-[9px] mt-1 font-bold text-slate-400">
                     {msg.time}
                   </span>
@@ -145,14 +191,15 @@ export const EvaluasiAIView: React.FC<EvaluasiAIViewProps> = ({
       </div>
 
       {/* 4. Form Input */}
-      <form onSubmit={handleSend} className="p-3 border-t border-slate-200 bg-white flex gap-2 shrink-0">
+      <form onSubmit={handleSend} autoComplete="off" className="p-3 border-t border-slate-200 bg-white flex gap-2 shrink-0">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={isTyping}
           placeholder={isTyping ? 'Harap tunggu asisten selesai menganalisis...' : 'Ketik pertanyaan evaluasi layanan di sini...'}
-          className="flex-1 border border-slate-250 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm disabled:bg-slate-50"
+          className="flex-1 border border-slate-250 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm disabled:bg-slate-50 bg-slate-100"
+          autoComplete="off"
         />
         <button
           type="submit"

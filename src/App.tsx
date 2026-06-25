@@ -12,10 +12,53 @@ import { StatistikView } from './components/views/StatistikView';
 import { EvaluasiAIView } from './components/views/EvaluasiAIView';
 import { LoginView } from './components/views/LoginView';
 import { useCivicData } from './hooks/useCivicData';
+import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 import './index.css';
 
 export function App() {
+  const [toast, setToast] = React.useState<{ message: string; type: 'info' | 'success' | 'error' } | null>(null);
+
+  React.useEffect(() => {
+    const originalAlert = window.alert;
+    window.alert = (message: string) => {
+      let type: 'info' | 'success' | 'error' = 'success';
+      const msgLower = String(message).toLowerCase();
+      if (
+        msgLower.includes('gagal') ||
+        msgLower.includes('salah') ||
+        msgLower.includes('besar') ||
+        msgLower.includes('harap') ||
+        msgLower.includes('belum') ||
+        msgLower.includes('yakin') ||
+        msgLower.includes('tolak')
+      ) {
+        type = 'error';
+      } else if (
+        msgLower.includes('berhasil') ||
+        msgLower.includes('sukses') ||
+        msgLower.includes('selesai') ||
+        msgLower.includes('apresiasi')
+      ) {
+        type = 'success';
+      } else {
+        type = 'info';
+      }
+      setToast({ message, type });
+    };
+
+    return () => {
+      window.alert = originalAlert;
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   const {
     adminCredentials,
     approvedUsers,
@@ -233,27 +276,70 @@ export function App() {
     }
   };
 
+  const renderToast = () => {
+    if (!toast) return null;
+    return (
+      <div className="fixed top-4 right-4 z-[9999] animate-fade-in max-w-sm w-[calc(100%-2rem)] bg-white/90 backdrop-blur-md border border-slate-200/80 shadow-lg rounded-2xl p-4 flex items-start gap-3 select-none">
+        {toast.type === 'success' && (
+          <div className="p-1 rounded-lg bg-emerald-50 text-emerald-600 shrink-0">
+            <CheckCircle2 size={18} />
+          </div>
+        )}
+        {toast.type === 'error' && (
+          <div className="p-1 rounded-lg bg-rose-50 text-rose-600 shrink-0">
+            <AlertCircle size={18} />
+          </div>
+        )}
+        {toast.type === 'info' && (
+          <div className="p-1 rounded-lg bg-blue-50 text-blue-600 shrink-0">
+            <Info size={18} />
+          </div>
+        )}
+        <div className="flex-1">
+          <p className={`text-xs font-bold ${
+            toast.type === 'success' ? 'text-emerald-950' : toast.type === 'error' ? 'text-rose-950' : 'text-slate-900'
+          }`}>
+            {toast.type === 'success' ? 'Berhasil' : toast.type === 'error' ? 'Pemberitahuan' : 'Informasi'}
+          </p>
+          <p className="text-[11px] text-slate-650 font-semibold leading-relaxed mt-0.5">{toast.message}</p>
+        </div>
+        <button 
+          onClick={() => setToast(null)} 
+          className="text-slate-400 hover:text-slate-650 p-0.5 rounded-lg hover:bg-slate-100 transition-colors shrink-0"
+        >
+          <X size={14} />
+        </button>
+      </div>
+    );
+  };
+
   if (!currentUser) {
     return (
-      <LoginView
-        onLoginWarga={handleLoginWarga}
-        onLoginAdmin={handleLoginAdmin}
-        onRegisterWarga={handleRegisterWarga}
-      />
+      <>
+        <LoginView
+          onLoginWarga={handleLoginWarga}
+          onLoginAdmin={handleLoginAdmin}
+          onRegisterWarga={handleRegisterWarga}
+        />
+        {renderToast()}
+      </>
     );
   }
 
   return (
-    <DashboardLayout
-      currentTab={currentTab}
-      onTabChange={setCurrentTab}
-      isAdmin={isAdmin}
-      activeRtRw={activeRtRw}
-      onRtRwChange={setActiveRtRw}
-      onLogout={handleLogout}
-    >
-      {renderActiveView()}
-    </DashboardLayout>
+    <>
+      <DashboardLayout
+        currentTab={currentTab}
+        onTabChange={setCurrentTab}
+        isAdmin={isAdmin}
+        activeRtRw={activeRtRw}
+        onRtRwChange={setActiveRtRw}
+        onLogout={handleLogout}
+      >
+        {renderActiveView()}
+      </DashboardLayout>
+      {renderToast()}
+    </>
   );
 }
 

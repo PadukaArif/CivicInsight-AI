@@ -123,7 +123,7 @@ export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
               <h3 className="text-lg font-bold text-slate-800">Lapor Aduan & Kendala Warga</h3>
             </div>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="kategori-aduan" className="block text-xs font-bold text-slate-700 mb-1">
@@ -133,7 +133,7 @@ export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
                     id="kategori-aduan"
                     value={kategori}
                     onChange={(e) => setKategori(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl p-3 bg-white text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                    className="w-full border border-slate-300 rounded-xl p-3 bg-slate-100 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
                   >
                     <option value="Kebersihan">Kebersihan Lingkungan</option>
                     <option value="Infrastruktur">Jalan, Lampu, Saluran Air</option>
@@ -155,7 +155,8 @@ export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
                       value={lokasi}
                       onChange={(e) => setLokasi(e.target.value)}
                       placeholder="Contoh: Gang 3 depan rumah No. 12"
-                      className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-slate-850 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                      className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-slate-855 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary bg-slate-100"
+                      autoComplete="off"
                     />
                     <MapPin size={16} className="absolute left-3.5 top-4 text-slate-400" />
                   </div>
@@ -173,7 +174,8 @@ export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
                   value={deskripsi}
                   onChange={(e) => setDeskripsi(e.target.value)}
                   placeholder="Tulis keterangan sedetail mungkin agar pengurus RT mudah mendata dan menindaklanjuti..."
-                  className="w-full border border-slate-350 rounded-xl p-4 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                  className="w-full border border-slate-350 rounded-xl p-4 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary bg-slate-100"
+                  autoComplete="off"
                 />
               </div>
 
@@ -367,7 +369,7 @@ export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
                             <select
                               value={statusSelect}
                               onChange={(e) => setStatusSelect(e.target.value as any)}
-                              className="w-full border border-slate-300 rounded-xl p-2 bg-white text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                              className="w-full border border-slate-300 rounded-xl p-2 bg-slate-100 text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
                             >
                               <option value="Terkirim">Terkirim (Belum Diproses)</option>
                               <option value="Diproses">Diproses (Tindak Lanjut)</option>
@@ -385,7 +387,8 @@ export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
                             value={tanggapanText}
                             onChange={(e) => setTanggapanText(e.target.value)}
                             placeholder="Contoh: Kami sudah menghubungi seksi keamanan / dinas kebersihan untuk datang mengecek..."
-                            className="w-full border border-slate-350 rounded-xl p-3 text-slate-855 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                            className="w-full border border-slate-350 rounded-xl p-3 text-slate-855 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary bg-slate-100"
+                            autoComplete="off"
                           />
                         </div>
 

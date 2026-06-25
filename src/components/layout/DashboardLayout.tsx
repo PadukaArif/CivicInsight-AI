@@ -99,15 +99,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           onTabChange={onTabChange}
           onLogout={onLogout}
         />
-
         {/* 
           Area Konten Halaman:
           Menggunakan overflow-y-auto agar area ini dapat di-scroll secara independen.
-          Mengambil lebar penuh layar pada desktop karena Sidebar kiri dihilangkan.
         */}
         <main 
           ref={mainRef}
-          className="flex-1 overflow-y-auto p-4 md:p-6 focus:outline-none"
+          className="flex-1 overflow-y-auto pt-20 pb-4 px-4 md:p-6 focus:outline-none"
           tabIndex={-1}
         >
           <div className="max-w-6xl mx-auto w-full flex flex-col min-h-[calc(100vh-8rem)]">

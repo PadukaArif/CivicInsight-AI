@@ -3,9 +3,9 @@ import { LogIn, User, Shield, Lock, Mail, CreditCard, Sparkles, UserPlus, AlertC
 import logoImg from '../../logo.png';
 
 interface LoginViewProps {
-  onLoginWarga: (email: string, pass: string) => { success: boolean; error?: string };
+  onLoginWarga: (email: string, pass: string) => Promise<{ success: boolean; error?: string }> | any;
   onLoginAdmin: (username: string, pass: string) => { success: boolean; error?: string };
-  onRegisterWarga: (name: string, email: string, nik: string, pass: string) => { success: boolean; error?: string };
+  onRegisterWarga: (name: string, email: string, nik: string, pass: string) => Promise<{ success: boolean; error?: string }> | any;
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({
@@ -42,7 +42,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
     setSuccessMsg(null);
   };
 
-  const handleWargaLoginSubmit = (e: React.FormEvent) => {
+  const handleWargaLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearMessages();
 
@@ -51,7 +51,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
       return;
     }
 
-    const res = onLoginWarga(email.trim().toLowerCase(), password);
+    const res = await onLoginWarga(email.trim().toLowerCase(), password);
     if (!res.success) {
       setErrorMsg(res.error || 'Email atau kata sandi salah!');
     }
@@ -72,7 +72,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
     }
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearMessages();
 
@@ -86,7 +86,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
       return;
     }
 
-    const res = onRegisterWarga(regName.trim(), regEmail.trim().toLowerCase(), regNik.trim(), regPass);
+    const res = await onRegisterWarga(regName.trim(), regEmail.trim().toLowerCase(), regNik.trim(), regPass);
     if (res.success) {
       setSuccessMsg(
         'Registrasi Berhasil! Akun Anda saat ini PENDING. Silakan melapor langsung ke Pak RT/RW setempat untuk disetujui (approve) sebelum masuk ke dashboard.'
@@ -178,7 +178,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
             /* ======================== CITIZEN AUTH FORM ======================== */
             wargaMode === 'login' ? (
               /* CITIZEN LOGIN */
-              <form onSubmit={handleWargaLoginSubmit} className="space-y-4 animate-fade-in">
+              <form onSubmit={handleWargaLoginSubmit} autoComplete="off" className="space-y-4 animate-fade-in">
                 <div className="space-y-3.5">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-1">Email Warga:</label>
@@ -189,7 +189,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="nama@email.com"
-                        className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
+                        className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-slate-100"
+                        autoComplete="off"
                       />
                       <Mail size={16} className="absolute left-3.5 top-3 text-slate-400" />
                     </div>
@@ -204,7 +205,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
+                        className="w-full border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-slate-100"
+                        autoComplete="off"
                       />
                       <Lock size={16} className="absolute left-3.5 top-3 text-slate-400" />
                       <button
@@ -242,7 +244,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
               </form>
             ) : (
               /* CITIZEN REGISTER */
-              <form onSubmit={handleRegisterSubmit} className="space-y-4 animate-fade-in">
+              <form onSubmit={handleRegisterSubmit} autoComplete="off" className="space-y-4 animate-fade-in">
                 <div className="space-y-3.5">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-1">Nama Lengkap Anda:</label>
@@ -253,7 +255,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
                         value={regName}
                         onChange={(e) => setRegName(e.target.value)}
                         placeholder="Contoh: Budi Santoso"
-                        className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
+                        className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-slate-100"
+                        autoComplete="off"
                       />
                       <User size={16} className="absolute left-3.5 top-3 text-slate-400" />
                     </div>
@@ -268,7 +271,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
                         value={regEmail}
                         onChange={(e) => setRegEmail(e.target.value)}
                         placeholder="contoh@warga.com"
-                        className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
+                        className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-slate-100"
+                        autoComplete="off"
                       />
                       <Mail size={16} className="absolute left-3.5 top-3 text-slate-400" />
                     </div>
@@ -284,7 +288,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
                         onChange={(e) => setRegNik(e.target.value)}
                         placeholder="16 digit angka NIK"
                         maxLength={16}
-                        className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
+                        className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-slate-100"
+                        autoComplete="off"
                       />
                       <CreditCard size={16} className="absolute left-3.5 top-3 text-slate-400" />
                     </div>
@@ -299,7 +304,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
                         value={regPass}
                         onChange={(e) => setRegPass(e.target.value)}
                         placeholder="Kata sandi minimal 6 karakter"
-                        className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
+                        className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-slate-100"
+                        autoComplete="off"
                       />
                       <Lock size={16} className="absolute left-3.5 top-3 text-slate-400" />
                     </div>
@@ -331,7 +337,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
             )
           ) : (
             /* ======================== ADMIN AUTH FORM ======================== */
-            <form onSubmit={handleAdminLoginSubmit} className="space-y-4 animate-fade-in">
+            <form onSubmit={handleAdminLoginSubmit} autoComplete="off" className="space-y-4 animate-fade-in">
               <div className="space-y-3.5">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">Username Pengurus:</label>
@@ -342,7 +348,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
                       value={adminUser}
                       onChange={(e) => setAdminUser(e.target.value)}
                       placeholder="Masukkan username..."
-                      className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
+                      className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-slate-100"
+                      autoComplete="off"
                     />
                     <User size={16} className="absolute left-3.5 top-3 text-slate-400" />
                   </div>
@@ -357,7 +364,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
                       value={adminPass}
                       onChange={(e) => setAdminPass(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
+                      className="w-full border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-slate-100"
+                      autoComplete="off"
                     />
                     <Lock size={16} className="absolute left-3.5 top-3 text-slate-400" />
                     <button

@@ -218,7 +218,8 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
                 type="number"
                 value={wargaInput}
                 onChange={(e) => setWargaInput(e.target.value)}
-                className="w-full border border-slate-300 rounded px-1.5 py-0.5 text-slate-800 text-sm mt-1 focus:ring-1 focus:ring-civic-primary focus:outline-none"
+                className="w-full border border-slate-300 rounded px-1.5 py-0.5 text-slate-800 text-sm mt-1 focus:ring-1 focus:ring-civic-primary focus:outline-none bg-slate-100"
+                autoComplete="off"
               />
             ) : (
               <span className="text-lg font-black text-slate-800">{totalWarga} Jiwa</span>
@@ -238,7 +239,8 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
                 type="number"
                 value={kasInput}
                 onChange={(e) => setKasInput(e.target.value)}
-                className="w-full border border-slate-300 rounded px-1.5 py-0.5 text-slate-800 text-sm mt-1 focus:ring-1 focus:ring-civic-primary focus:outline-none"
+                className="w-full border border-slate-300 rounded px-1.5 py-0.5 text-slate-800 text-sm mt-1 focus:ring-1 focus:ring-civic-primary focus:outline-none bg-slate-100"
+                autoComplete="off"
               />
             ) : (
               <span className="text-lg font-black text-slate-800">{formatRupiah(kasRT)}</span>
@@ -260,7 +262,8 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
                 type="number"
                 value={poinInput}
                 onChange={(e) => setPoinInput(e.target.value)}
-                className="w-full border border-slate-300 rounded px-1.5 py-0.5 text-slate-800 text-sm mt-1 focus:ring-1 focus:ring-civic-primary focus:outline-none"
+                className="w-full border border-slate-300 rounded px-1.5 py-0.5 text-slate-800 text-sm mt-1 focus:ring-1 focus:ring-civic-primary focus:outline-none bg-slate-100"
+                autoComplete="off"
               />
             ) : (
               <div className="flex items-center gap-1.5">

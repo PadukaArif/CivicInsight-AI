@@ -71,7 +71,7 @@ export const KelolaRtTab: React.FC<KelolaRtTabProps> = ({
         </div>
 
         {isEditingSchedules ? (
-          <form onSubmit={handleSaveSchedules} className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-4">
+          <form onSubmit={handleSaveSchedules} autoComplete="off" className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-4">
             <h4 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider select-none">
               Ubah Parameter Operasional (Admin Only)
             </h4>
@@ -86,7 +86,8 @@ export const KelolaRtTab: React.FC<KelolaRtTabProps> = ({
                   type="text"
                   value={inputSampah}
                   onChange={(e) => setInputSampah(e.target.value)}
-                  className="w-full border border-slate-300 bg-white rounded-xl px-3.5 py-2 text-slate-850 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary font-bold"
+                  className="w-full border border-slate-300 bg-slate-100 rounded-xl px-3.5 py-2 text-slate-850 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary font-bold"
+                  autoComplete="off"
                 />
               </div>
               
@@ -99,7 +100,8 @@ export const KelolaRtTab: React.FC<KelolaRtTabProps> = ({
                   type="text"
                   value={inputOperasional}
                   onChange={(e) => setInputOperasional(e.target.value)}
-                  className="w-full border border-slate-300 bg-white rounded-xl px-3.5 py-2 text-slate-850 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary font-bold"
+                  className="w-full border border-slate-300 bg-slate-100 rounded-xl px-3.5 py-2 text-slate-850 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary font-bold"
+                  autoComplete="off"
                 />
               </div>
             </div>
@@ -201,6 +203,7 @@ export const KelolaRtTab: React.FC<KelolaRtTabProps> = ({
                     alert('Kontak darurat baru berhasil ditambahkan!');
                   }
                 }}
+                autoComplete="off"
                 className="bg-white border border-slate-200 p-3.5 rounded-xl space-y-2 text-xs"
               >
                 <span className="font-bold text-slate-800 block mb-1">Tambah Kontak Darurat Baru</span>
@@ -211,7 +214,8 @@ export const KelolaRtTab: React.FC<KelolaRtTabProps> = ({
                     value={newContactNama}
                     onChange={(e) => setNewContactNama(e.target.value)}
                     required
-                    className="w-full border border-slate-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none"
+                    className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 focus:outline-none"
+                    autoComplete="off"
                   />
                 </div>
                 <div>
@@ -221,7 +225,8 @@ export const KelolaRtTab: React.FC<KelolaRtTabProps> = ({
                     value={newContactNomor}
                     onChange={(e) => setNewContactNomor(e.target.value)}
                     required
-                    className="w-full border border-slate-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none font-mono"
+                    className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 focus:outline-none font-mono"
+                    autoComplete="off"
                   />
                 </div>
                 <div className="flex gap-2 justify-end pt-1">
@@ -332,6 +337,7 @@ export const KelolaRtTab: React.FC<KelolaRtTabProps> = ({
                   alert('Kontak darurat berhasil diperbarui!');
                 }
               }}
+              autoComplete="off"
               className="space-y-4 text-xs"
             >
               <div>
@@ -341,7 +347,8 @@ export const KelolaRtTab: React.FC<KelolaRtTabProps> = ({
                   required
                   value={editContactNama}
                   onChange={(e) => setEditContactNama(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                  className="w-full border border-slate-300 bg-slate-100 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                  autoComplete="off"
                 />
               </div>
 
@@ -352,7 +359,8 @@ export const KelolaRtTab: React.FC<KelolaRtTabProps> = ({
                   required
                   value={editContactNomor}
                   onChange={(e) => setEditContactNomor(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-850 font-mono focus:outline-none"
+                  className="w-full border border-slate-300 bg-slate-100 rounded-xl px-3.5 py-2 text-sm text-slate-850 font-mono focus:outline-none"
+                  autoComplete="off"
                 />
               </div>
 

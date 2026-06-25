@@ -3,7 +3,32 @@ import index from "./index.html";
 
 const server = serve({
   routes: {
-    // Serve index.html for all unmatched routes.
+    "/news/*": async (req) => {
+      const url = new URL(req.url);
+      const backendUrl = `http://localhost:4000${url.pathname}${url.search}`;
+      try {
+        const res = await fetch(backendUrl, {
+          method: req.method,
+          headers: req.headers,
+        });
+        return res;
+      } catch (err) {
+        return Response.json({ error: String(err) }, { status: 500 });
+      }
+    },
+    "/health/*": async (req) => {
+      const url = new URL(req.url);
+      const backendUrl = `http://localhost:4000${url.pathname}${url.search}`;
+      try {
+        const res = await fetch(backendUrl, {
+          method: req.method,
+          headers: req.headers,
+        });
+        return res;
+      } catch (err) {
+        return Response.json({ error: String(err) }, { status: 500 });
+      }
+    },
     "/*": index,
 
     "/api/hello": {

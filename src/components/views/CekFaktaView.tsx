@@ -63,6 +63,52 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
   const [inputText, setInputText] = React.useState('');
   const chatContainerRef = React.useRef<HTMLDivElement>(null);
 
+  const parseBoldAndLinks = (line: string) => {
+    const parts = line.split(/(\*\*|\*)/g);
+    let isBold = false;
+    return parts.map((part, idx) => {
+      if (part === '**' || part === '*') {
+        isBold = !isBold;
+        return null;
+      }
+      
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      if (urlRegex.test(part)) {
+        const subParts = part.split(urlRegex);
+        return (
+          <span key={idx}>
+            {subParts.map((subPart, subIdx) => {
+              if (urlRegex.test(subPart)) {
+                return (
+                  <a
+                    key={subIdx}
+                    href={subPart}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-teal-650 hover:text-teal-800 underline font-bold break-all"
+                  >
+                    {subPart}
+                  </a>
+                );
+              }
+              return isBold ? <strong key={subIdx} className="font-extrabold text-slate-900">{subPart}</strong> : subPart;
+            })}
+          </span>
+        );
+      }
+
+      return isBold ? <strong key={idx} className="font-extrabold text-slate-900">{part}</strong> : part;
+    });
+  };
+
+  const renderMessageText = (text: string) => {
+    return text.split('\n').map((line, lineIdx) => (
+      <div key={lineIdx} className="min-h-[1.25rem]">
+        {parseBoldAndLinks(line)}
+      </div>
+    ));
+  };
+
   // Auto-scroll chat container
   React.useEffect(() => {
     if (chatContainerRef.current) {
@@ -81,18 +127,285 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
     setIsTyping(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const lower = userText.toLowerCase();
+      const lower = userText.toLowerCase().trim();
       let reply = '';
 
-      if (lower.includes('berita') || lower.includes('isu') || lower.includes('sosial') || lower.includes('negara')) {
-        reply = '📰 [API BERITA REAL-TIME]\n- Insentif UMKM: Pemerintah memperluas jangkauan subsidi KUR bagi usaha mikro.\n- Kondisi Sosial: Kampanye kepedulian sampah plastik nasional mulai diterapkan di pasar tradisional.\n- Ekonomi: Inflasi nasional terkendali di angka 2.8%, menjaga harga kebutuhan pokok tetap stabil di tingkat pasar.';
-      } else if (lower.includes('sehat') || lower.includes('dbd') || lower.includes('virus') || lower.includes('medis') || lower.includes('nyamuk') || lower.includes('sakit')) {
-        reply = '🏥 [API KESEHATAN REAL-TIME]\n- Waspada DBD: Lonjakan kasus demam berdarah terdeteksi di beberapa wilayah perkotaan akibat curah hujan tinggi.\n- Pencegahan: Lakukan 3M Plus secara rutin. Gunakan lotion anti-nyamuk saat beraktivitas di luar.\n- Kesehatan Mental: Kementerian Kesehatan meluncurkan hotline konseling psikologis gratis 24 jam di nomor 119 ext 8.';
-      } else if (lower.includes('konsultasi') || lower.includes('bantuan') || lower.includes('panduan')) {
-        reply = 'ℹ️ [PANDUAN SISTEM PORTAL]\nUntuk bantuan administrasi surat pengantar RT, silakan gunakan menu Konsultasi AI di navigasi atas. Jika ingin melaporkan infrastruktur rusak, gunakan menu Lapor Aduan. Chatbot ini khusus untuk memantau berita & kesehatan nasional.';
-      } else {
-        reply = '🤖 [API INTEGRASI BERITA & KESEHATAN]\nTerima kasih atas pertanyaan Anda. Berdasarkan penelusuran API berita dan kesehatan:\n- Tidak ditemukan isu krusial baru mengenai kata kunci tersebut hari ini.\n- Secara umum, kondisi nasional terpantau aman dan terkendali.\n\nCobalah tanyakan tentang "berita terbaru", "isu sosial", atau "pencegahan DBD" untuk informasi yang lebih spesifik.';
+      // Stopwords for clean search extraction
+      const stopwords = [
+        'apakah', 'ada', 'berita', 'tentang', 'info', 'kabar', 'saya', 'ingin', 'tahu', 
+        'tanyakan', 'cari', 'mengenai', 'laporan', 'isu', 'yang', 'di', 'ke', 
+        'dari', 'untuk', 'pada', 'dengan', 'adalah', 'sebagai', 'terbaru', 'hari', 'ini',
+        'bisa', 'tolong', 'bagaimana', 'apa', 'siapa', 'kapan', 'mengapa', 'gimana', 'dong',
+        'cnn', 'tempo', 'jaki', 'jakarta', 'bansos', 'sehat', 'kesehatan',
+        'bantuan', 'sosial', 'mana', 'nya', 'dan', 'atau', 'juga', 'sudah', 'belum',
+        'akan', 'baru', 'lagi', 'saat', 'sedang', 'masih', 'semua', 'lebih', 'sangat',
+        'harus', 'banyak', 'seperti', 'mereka', 'kami', 'kita', 'tersebut'
+      ];
+      
+      const cleanText = lower.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+      const words = cleanText.split(/\s+/);
+      const searchWords = words.filter(w => !stopwords.includes(w) && w.length > 2);
+      const searchTerm = searchWords.join(' ');
+
+      // --- INTENT CLASSIFICATION ---
+
+      // 1. BANSOS intent
+      if (lower.includes('bansos') || lower.includes('bantuan sosial') || lower.includes('bpnt') || lower.includes('pkh') || lower.includes('pbi-jk') || lower.includes('dtks')) {
+        try {
+          const res = await fetch("http://localhost:4000/news/bansos");
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            let filtered = data;
+            if (searchTerm) {
+              filtered = data.filter((item: any) => 
+                item.nama.toLowerCase().includes(searchTerm) || 
+                item.nik.toLowerCase().includes(searchTerm) ||
+                item.wilayah.toLowerCase().includes(searchTerm)
+              );
+            }
+            
+            if (filtered.length > 0) {
+              reply = `💰 **[API CEK BANSOS REAL-TIME]**\nStatus penerima bantuan sosial:${searchTerm ? ` (Pencarian: "${searchTerm}")` : ''}\n\n` + 
+                filtered.map((item: any) => `👤 **Nama**: ${item.nama}\n🆔 **NIK**: ${item.nik}\n📍 **Wilayah**: ${item.wilayah}\n🍚 **BPNT**: ${item.bpnt}\n🎓 **PKH**: ${item.pkh}\n🏥 **PBI-JK**: ${item.pbi_jk}`).join('\n\n');
+            } else {
+              reply = `💰 **[API CEK BANSOS REAL-TIME]**\nTidak ada data penerima bansos yang cocok dengan pencarian **"${searchTerm}"**.\n\n**Coba ketik nama warga penerima bansos lainnya.**`;
+            }
+          } else {
+            reply = `💰 **[API CEK BANSOS REAL-TIME]**\nData bansos kosong atau tidak ditemukan.`;
+          }
+        } catch (e) {
+          reply = `💰 **[API CEK BANSOS REAL-TIME]**\nGagal memuat data bansos. Silakan coba lagi nanti.`;
+        }
+      } 
+      // 2. JAKI intent
+      else if (lower.includes('jaki') || (lower.includes('jakarta') && (lower.includes('aduan') || lower.includes('lapor') || lower.includes('infrastruktur')))) {
+        try {
+          const res = await fetch("http://localhost:4000/news/jaki");
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            let filtered = data;
+            if (searchTerm) {
+              filtered = data.filter((item: any) => 
+                item.kategori.toLowerCase().includes(searchTerm) || 
+                item.lokasi.toLowerCase().includes(searchTerm) ||
+                item.deskripsi.toLowerCase().includes(searchTerm) ||
+                item.status.toLowerCase().includes(searchTerm)
+              );
+            }
+            
+            if (filtered.length > 0) {
+              reply = `🏙️ **[API JAKI REPORTS REAL-TIME]**\nLaporan warga terbaru di sistem JAKI:${searchTerm ? ` (Pencarian: "${searchTerm}")` : ''}\n\n` + 
+                filtered.map((item: any) => `🆔 **${item.id}** - **${item.kategori}**\n📍 Lokasi: ${item.lokasi}\n📝 Deskripsi: ${item.deskripsi}\n⚡ Status: **${item.status}**`).join('\n\n');
+            } else {
+              reply = `🏙️ **[API JAKI REPORTS REAL-TIME]**\nTidak ada laporan JAKI yang cocok dengan kata kunci **"${searchTerm}"**.`;
+            }
+          } else {
+            reply = `🏙️ **[API JAKI REPORTS REAL-TIME]**\nTidak ada laporan JAKI yang tersedia saat ini.`;
+          }
+        } catch (e) {
+          reply = `🏙️ **[API JAKI REPORTS REAL-TIME]**\nGagal memuat laporan JAKI. Silakan coba lagi nanti.`;
+        }
+      } 
+      // 3. HEALTH intent — expanded keyword list for Indonesian health topics
+      else if (
+        lower.includes('sehat') || lower.includes('kesehatan') || lower.includes('dbd') || 
+        lower.includes('virus') || lower.includes('medis') || lower.includes('sakit') || 
+        lower.includes('health') || lower.includes('medicine') || lower.includes('penyakit') ||
+        lower.includes('demam') || lower.includes('stunting') || lower.includes('gizi') ||
+        lower.includes('imunisasi') || lower.includes('vaksin') || lower.includes('tbc') ||
+        lower.includes('malaria') || lower.includes('hiv') || lower.includes('aids') ||
+        lower.includes('diabetes') || lower.includes('kolesterol') || lower.includes('hipertensi') ||
+        lower.includes('covid') || lower.includes('corona') || lower.includes('obat') ||
+        lower.includes('rumah sakit') || lower.includes('puskesmas') || lower.includes('bpjs') ||
+        lower.includes('kematian') || lower.includes('kelahiran') || lower.includes('harapan hidup') ||
+        lower.includes('sanitasi') || lower.includes('air bersih') || lower.includes('diare') ||
+        lower.includes('pneumonia') || lower.includes('campak') || lower.includes('polio') ||
+        lower.includes('hepatitis') || lower.includes('kanker') || lower.includes('jantung')
+      ) {
+        try {
+          // Build a better query word for health search
+          const healthKeywords = ['dbd', 'virus', 'stunting', 'gizi', 'tbc', 'malaria', 'hiv', 'aids',
+            'diabetes', 'kolesterol', 'hipertensi', 'covid', 'corona', 'diare', 'pneumonia',
+            'campak', 'polio', 'hepatitis', 'kanker', 'jantung', 'demam', 'vaksin', 'imunisasi',
+            'kematian', 'kelahiran', 'sanitasi', 'obat', 'puskesmas', 'bpjs'];
+          const matchedHealthKeyword = healthKeywords.find(k => lower.includes(k));
+          const queryWord = searchTerm || matchedHealthKeyword || '';
+          
+          const res = await fetch(`http://localhost:4000/health/news?q=${encodeURIComponent(queryWord)}`);
+          const data = await res.json();
+          const list = data.value || data;
+          
+          let healthReply = '';
+          if (Array.isArray(list) && list.length > 0) {
+            let filtered = list;
+            if (queryWord) {
+              filtered = list.filter((item: any) => 
+                item.IndicatorName.toLowerCase().includes(queryWord.toLowerCase()) || 
+                item.IndicatorCode.toLowerCase().includes(queryWord.toLowerCase())
+              );
+            }
+            
+            if (filtered.length > 0) {
+              healthReply = `🏥 **[API KESEHATAN REAL-TIME - INDIKATOR KESEHATAN GLOBAL]**\nBerikut adalah beberapa indikator kesehatan terkait:${queryWord ? ` (Pencarian: "${queryWord}")` : ''}\n\n` + 
+                filtered.slice(0, 5).map((item: any) => `🩺 **${item.IndicatorName}**\n🔑 Kode: ${item.IndicatorCode}`).join('\n\n');
+            }
+          }
+          
+          // If WHO API doesn't give relevant results, ask AI with health context
+          if (!healthReply) {
+            const healthSystemPrompt = `Anda adalah Chatbot Kesehatan & Cek Fakta di CivicInsight AI. Tugas Anda:
+1. Menjawab pertanyaan kesehatan masyarakat (penyakit, pencegahan, gizi, vaksinasi, dll.)
+2. Memberikan informasi kesehatan yang akurat berdasarkan sumber WHO, Kemenkes RI
+3. Menjelaskan istilah medis dalam bahasa sederhana
+4. Memberikan saran pencegahan penyakit
+
+Penting:
+- Jawab SELALU dalam Bahasa Indonesia
+- Format dengan Markdown (**tebal** untuk penekanan)
+- Jika ditanya hal di luar kesehatan, arahkan ke fitur chatbot yang sesuai
+- Berikan disclaimer bahwa saran medis tetap harus dikonsultasikan ke tenaga kesehatan profesional`;
+
+            try {
+              const aiRes = await fetch('http://localhost:4000/ai/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                  message: userText,
+                  provider: 'gemini',
+                  systemPrompt: healthSystemPrompt
+                })
+              });
+              const aiData = await aiRes.json();
+              if (aiData.success && aiData.reply && !aiData.reply.includes("dummy-gemini-key-placeholder")) {
+                healthReply = `🏥 **[ASISTEN KESEHATAN AI]**\n\n${aiData.reply}`;
+              }
+            } catch (aiErr) {
+              console.warn("Health AI fallback failed:", aiErr);
+            }
+          }
+          
+          reply = healthReply || `🏥 **[API KESEHATAN]**\nMaaf, tidak ditemukan informasi kesehatan spesifik untuk topik tersebut. Silakan coba kata kunci lain seperti: **dbd**, **stunting**, **gizi**, **vaksin**, **tbc**, **diabetes**, **hipertensi**.`;
+        } catch (e) {
+          reply = `🏥 **[API KESEHATAN]**\nGagal memuat data indikator kesehatan. Silakan coba lagi nanti.`;
+        }
+      } 
+      // 4. NEWS search — CNN and Tempo
+      else {
+        const queryTerm = searchTerm || lower;
+        
+        // Greeting detection
+        const isGreeting = ['halo', 'hai', 'pagi', 'siang', 'sore', 'malam', 'selamat'].some(g => lower.includes(g)) && lower.length < 30;
+        // Navigation/help request detection
+        const isNavigation = lower.includes('konsultasi') || lower.includes('panduan') || lower.includes('menu');
+        
+        if (!isGreeting && !isNavigation && queryTerm) {
+          try {
+            const [cnnRes, tempoRes] = await Promise.all([
+              fetch(`http://localhost:4000/news/cnn/search?q=${encodeURIComponent(queryTerm)}`),
+              fetch(`http://localhost:4000/news/tempo/search?q=${encodeURIComponent(queryTerm)}`)
+            ]);
+            
+            const cnnData = await cnnRes.json();
+            const tempoData = await tempoRes.json();
+            
+            const hasCnn = Array.isArray(cnnData) && cnnData.length > 0;
+            const hasTempo = Array.isArray(tempoData) && tempoData.length > 0;
+            
+            if (hasCnn || hasTempo) {
+              reply = `🔍 **[HASIL PENCARIAN BERITA REAL-TIME: "${queryTerm}"]**\n\n`;
+              if (hasCnn) {
+                reply += `📰 **CNN Indonesia**:\n` + 
+                  cnnData.slice(0, 2).map((item: any) => `- **${item.title}**\n  ${item.description || ''}\n  🔗 ${item.url}`).join('\n\n') + `\n\n`;
+              }
+              if (hasTempo) {
+                reply += `📰 **Tempo**:\n` + 
+                  tempoData.slice(0, 2).map((item: any) => `- **${item.title}**\n  ${item.content || ''}\n  🔗 ${item.link}`).join('\n\n');
+              }
+            } else {
+              // No news found — try AI for social issue / general knowledge
+              const cekFaktaSystemPrompt = `Anda adalah Chatbot Cek Fakta & Isu Sosial untuk warga RT/RW di CivicInsight AI. Tugas Anda:
+1. Membantu memverifikasi kebenaran informasi dan berita
+2. Memberikan analisis isu sosial terkini (kemiskinan, pendidikan, korupsi, lingkungan, politik, ekonomi)
+3. Menjawab pertanyaan umum tentang isu-isu sosial Indonesia
+4. Memberikan konteks dan fakta terkait isu yang ditanyakan
+
+Penting:
+- Jawab SELALU dalam Bahasa Indonesia
+- Format dengan Markdown (**tebal** untuk penekanan, link jika ada)
+- Berikan fakta yang objektif dan seimbang
+- Jika tidak tahu, katakan jujur dan arahkan ke sumber terpercaya`;
+
+              try {
+                const aiRes = await fetch('http://localhost:4000/ai/chat', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ 
+                    message: userText,
+                    provider: 'gemini',
+                    systemPrompt: cekFaktaSystemPrompt
+                  })
+                });
+                const aiData = await aiRes.json();
+                if (aiData.success && aiData.reply && !aiData.reply.includes("dummy-gemini-key-placeholder")) {
+                  reply = aiData.reply;
+                }
+              } catch (aiErr) {
+                console.warn("Cek Fakta AI fallback failed:", aiErr);
+              }
+              
+              if (!reply) {
+                const latestRes = await fetch("http://localhost:4000/news/cnn");
+                const latestData = await latestRes.json();
+                reply = `🔍 **[PENCARIAN BERITA: "${queryTerm}"]**\nMaaf, tidak ditemukan berita khusus mengenai kata kunci tersebut.\n\n` +
+                  `📰 **Berikut berita terhangat hari ini sebagai gantinya:**\n\n` +
+                  latestData.slice(0, 3).map((item: any) => `📌 **${item.title}**\n🔗 Selengkapnya: ${item.url}`).join('\n\n');
+              }
+            }
+          } catch (e) {
+            reply = `🔍 **[PENCARIAN BERITA]**\nGagal melakukan pencarian berita. Silakan coba lagi nanti.`;
+          }
+        } 
+        else if (isNavigation) {
+          reply = 'ℹ️ **[PANDUAN SISTEM PORTAL]**\nUntuk bantuan administrasi surat pengantar RT, silakan gunakan menu **Konsultasi AI** di navigasi atas. Jika ingin melaporkan infrastruktur rusak, gunakan menu **Lapor Aduan**. Chatbot ini khusus untuk memantau berita & kesehatan nasional.';
+        } 
+        else {
+          // Greeting or very short messages — use AI with Cek Fakta identity
+          const greetingSystemPrompt = `Anda adalah Chatbot Cek Fakta & Isu Sosial di CivicInsight AI. Sapa warga dengan ramah dan jelaskan bahwa Anda bisa membantu:
+1. Mencari berita terkini dari CNN Indonesia & Tempo
+2. Mengecek data penerima Bansos (BPNT, PKH, PBI-JK)
+3. Melihat laporan aduan JAKI Jakarta
+4. Menjawab pertanyaan kesehatan masyarakat
+5. Memverifikasi fakta dan isu sosial
+
+Jawab dalam Bahasa Indonesia, singkat dan ramah. Format dengan Markdown (**tebal** untuk penekanan).`;
+
+          try {
+            const res = await fetch('http://localhost:4000/ai/chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                message: userText,
+                provider: 'gemini',
+                systemPrompt: greetingSystemPrompt
+              })
+            });
+            const data = await res.json();
+            if (data.success && data.reply && !data.reply.includes("dummy-gemini-key-placeholder")) {
+              reply = data.reply;
+            }
+          } catch (e) {
+            console.warn("Cek Fakta greeting AI failed:", e);
+          }
+
+          if (!reply) {
+            reply = `🤖 **[CHATBOT CEK FAKTA]**\nHalo! Tanyakan saya apa saja tentang isu sosial/berita nasional, laporan JAKI, status Bansos, atau kesehatan:\n\n` +
+              `• **berita** (contoh: **"berita tentang mudik"**, **"longsor tempo"**)\n` +
+              `• **jaki** (contoh: **"aduan jaki jalan rusak"**, **"jaki selesai"**)\n` +
+              `• **bansos** (contoh: **"apakah bansos rayyan cair?"**, **"bansos bpnt"**)\n` +
+              `• **kesehatan** (contoh: **"kesehatan dbd"**, **"info stunting"**, **"vaksin polio"**)\n\n` +
+              `Ketik kata kunci atau topik pencarian Anda secara langsung!`;
+          }
+        }
       }
 
       const aiTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -167,7 +480,8 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Ketik kata kunci... (contoh: bansos, kerja bakti, fogging, maling)"
-            className="w-full border border-slate-350 rounded-xl pl-10 pr-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-civic-primary text-base"
+            className="w-full border border-slate-350 rounded-xl pl-10 pr-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-civic-primary text-base bg-slate-100"
+            autoComplete="off"
           />
           <Search size={18} className="absolute left-3.5 top-3.5 text-slate-400" />
         </div>
@@ -243,7 +557,7 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                 Menemukan berita mencurigakan di grup WA keluarga atau tetangga? Tempel dan laporkan di sini agar Pak RT memverifikasinya.
               </p>
 
-              <form onSubmit={handleReportRumor} className="space-y-4">
+              <form onSubmit={handleReportRumor} autoComplete="off" className="space-y-4">
                 <div>
                   <label htmlFor="rumor-input" className="block text-xs font-bold text-slate-700 mb-1">
                     Konten Berita / Tangkapan Teks:
@@ -255,7 +569,8 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                     value={rumorText}
                     onChange={(e) => setRumorText(e.target.value)}
                     placeholder="Contoh: Bantuan sosial tambahan sebesar 100 ribu dibagikan besok malam jam 8 di kelurahan..."
-                    className="w-full border border-slate-350 rounded-xl p-3 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                    className="w-full border border-slate-350 rounded-xl p-3 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary bg-slate-100"
+                    autoComplete="off"
                   />
                 </div>
 
@@ -298,34 +613,34 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
             className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50"
           >
             {chatMessages.map((msg, idx) => {
-              const isUser = msg.sender === 'user';
-              if (isUser) {
-                return (
-                  <div key={idx} className="flex w-full justify-end">
-                    <div className="max-w-[75%] md:max-w-[65%] rounded-2xl px-4 py-2.5 bg-slate-900 text-white shadow-2xs text-sm font-medium rounded-tr-none">
-                      <p className="whitespace-pre-line leading-relaxed">{msg.text}</p>
-                      <span className="block text-right text-[9px] mt-1 font-bold text-slate-400">
-                        {msg.time}
-                      </span>
-                    </div>
-                  </div>
-                );
-              } else {
-                return (
-                  <div key={idx} className="flex w-full justify-start items-start gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-civic-primary text-white flex items-center justify-center shrink-0 shadow-3xs select-none mt-0.5">
-                      <Bot size={16} />
-                    </div>
-                    <div className="max-w-[75%] md:max-w-[65%] rounded-2xl px-4 py-2.5 bg-white text-slate-800 border border-slate-100 shadow-3xs text-sm font-medium rounded-tl-none">
-                      <p className="whitespace-pre-line leading-relaxed">{msg.text}</p>
-                      <span className="block text-left text-[9px] mt-1 font-bold text-slate-400">
-                        {msg.time}
-                      </span>
-                    </div>
-                  </div>
-                );
-              }
-            })}
+               const isUser = msg.sender === 'user';
+               if (isUser) {
+                 return (
+                   <div key={idx} className="flex w-full justify-end">
+                     <div className="max-w-[75%] md:max-w-[65%] rounded-2xl px-4 py-2.5 bg-slate-900 text-white shadow-2xs text-sm font-medium rounded-tr-none">
+                       <div className="leading-relaxed">{renderMessageText(msg.text)}</div>
+                       <span className="block text-right text-[9px] mt-1 font-bold text-slate-400">
+                         {msg.time}
+                       </span>
+                     </div>
+                   </div>
+                 );
+               } else {
+                 return (
+                   <div key={idx} className="flex w-full justify-start items-start gap-2.5">
+                     <div className="w-8 h-8 rounded-full bg-civic-primary text-white flex items-center justify-center shrink-0 shadow-3xs select-none mt-0.5">
+                       <Bot size={16} />
+                     </div>
+                     <div className="max-w-[75%] md:max-w-[65%] rounded-2xl px-4 py-2.5 bg-white text-slate-800 border border-slate-100 shadow-3xs text-sm font-medium rounded-tl-none">
+                       <div className="leading-relaxed">{renderMessageText(msg.text)}</div>
+                       <span className="block text-left text-[9px] mt-1 font-bold text-slate-400">
+                         {msg.time}
+                       </span>
+                     </div>
+                   </div>
+                 );
+               }
+             })}
 
             {isTyping && (
               <div className="flex justify-start items-start gap-2.5">
@@ -370,13 +685,14 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
           </div>
 
           {/* Input Form */}
-          <form onSubmit={handleSendChat} className="p-3 border-t border-slate-200 bg-white flex gap-2 shrink-0">
+          <form onSubmit={handleSendChat} autoComplete="off" className="p-3 border-t border-slate-200 bg-white flex gap-2 shrink-0">
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Tanyakan isu sosial atau berita kesehatan di sini..."
-              className="flex-1 border border-slate-250 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-civic-primary text-sm disabled:bg-slate-55"
+              className="flex-1 border border-slate-250 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-civic-primary text-sm disabled:bg-slate-55 bg-slate-100"
+              autoComplete="off"
             />
             <button
               type="submit"
@@ -441,7 +757,8 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                               value={verifikasiPenjelasan}
                               onChange={(e) => setVerifikasiPenjelasan(e.target.value)}
                               placeholder="Tulis alasan mengapa ini hoaks/fakta. Sebutkan buktinya agar warga percaya..."
-                              className="w-full border border-slate-300 rounded-xl p-3 text-slate-855 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                              className="w-full border border-slate-300 rounded-xl p-3 text-slate-855 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary bg-slate-100"
+                              autoComplete="off"
                             />
                           </div>
                           
@@ -551,7 +868,7 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Tulis Fakta Baru</h3>
               </div>
 
-              <form onSubmit={handlePostDirectFact} className="space-y-4">
+              <form onSubmit={handlePostDirectFact} autoComplete="off" className="space-y-4">
                 <div>
                   <label htmlFor="direct-title" className="block text-xs font-bold text-slate-700 mb-1">
                     Judul Kasus / Berita:
@@ -563,7 +880,8 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                     value={factJudul}
                     onChange={(e) => setFactJudul(e.target.value)}
                     placeholder="Contoh: Isu Penculikan Anak Gang 3"
-                    className="w-full border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                    className="w-full border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary bg-slate-100"
+                    autoComplete="off"
                   />
                 </div>
 
@@ -576,7 +894,7 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                       id="direct-status"
                       value={factStatus}
                       onChange={(e) => setFactStatus(e.target.value as any)}
-                      className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-white text-slate-855 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                      className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-slate-100 text-slate-855 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
                     >
                       <option value="fakta">FAKTA</option>
                       <option value="hoaks">HOAKS</option>
@@ -592,7 +910,8 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                       value={factSumber}
                       onChange={(e) => setFactSumber(e.target.value)}
                       placeholder="Babinkamtibmas/Polsek"
-                      className="w-full border border-slate-300 rounded-xl px-2 py-1.5 text-slate-855 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                      className="w-full border border-slate-300 rounded-xl px-2 py-1.5 text-slate-855 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary bg-slate-100"
+                      autoComplete="off"
                     />
                   </div>
                 </div>
@@ -608,7 +927,8 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                     value={factPenjelasan}
                     onChange={(e) => setFactPenjelasan(e.target.value)}
                     placeholder="Tulis klarifikasi detail untuk meluruskan kesalahpahaman warga..."
-                    className="w-full border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                    className="w-full border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary bg-slate-100"
+                    autoComplete="off"
                   />
                 </div>
 
@@ -648,6 +968,7 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                   alert('Klarifikasi informasi resmi berhasil diperbarui!');
                 }
               }}
+              autoComplete="off"
               className="space-y-4 text-xs"
             >
               <div>
@@ -657,7 +978,8 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                   required
                   value={editFactJudul}
                   onChange={(e) => setEditFactJudul(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none bg-slate-100"
+                  autoComplete="off"
                 />
               </div>
 
@@ -667,7 +989,7 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                   <select
                     value={editFactStatus}
                     onChange={(e) => setEditFactStatus(e.target.value as any)}
-                    className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-white text-slate-800 focus:outline-none"
+                    className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-slate-100 text-slate-800 focus:outline-none"
                   >
                     <option value="fakta">FAKTA</option>
                     <option value="hoaks">HOAKS</option>
@@ -679,7 +1001,8 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                     type="text"
                     value={editFactSumber}
                     onChange={(e) => setEditFactSumber(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                    className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none bg-slate-100"
+                    autoComplete="off"
                   />
                 </div>
               </div>
@@ -691,7 +1014,8 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
                   required
                   value={editFactPenjelasan}
                   onChange={(e) => setEditFactPenjelasan(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none bg-slate-100"
+                  autoComplete="off"
                 />
               </div>
 

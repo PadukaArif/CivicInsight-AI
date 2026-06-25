@@ -78,10 +78,9 @@ export const Header: React.FC<HeaderProps> = ({
       icon: item.icon as any,
     }));
   }, [desktopMenuItems]);
-
   return (
-    <header className="relative h-16 bg-civic-surface border-b border-slate-200 shadow-xs flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between px-4 md:px-6 sticky top-0 z-10 select-none">
-      
+    <header className="fixed md:sticky top-0 left-0 right-0 h-16 bg-civic-surface border-b border-slate-200 shadow-xs flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between px-4 md:px-6 z-40 select-none">
+
       {/* KIRI: Logo Desktop & Hamburger Mobile */}
       <div className="flex items-center gap-3 shrink-0 md:justify-self-start">
         {/* Tombol Hamburger - hanya muncul di mobile (md:hidden) */}

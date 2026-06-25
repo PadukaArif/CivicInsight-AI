@@ -104,7 +104,7 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
 
       {/* Form Tambah Anggota Keluarga Baru */}
       {showAddForm && (
-        <form onSubmit={handleAddMemberSubmit} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4 space-y-3.5">
+        <form onSubmit={handleAddMemberSubmit} autoComplete="off" className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4 space-y-3.5">
           <span className="block font-bold text-slate-800 text-xs">Pendaftaran Anggota KK Baru</span>
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -117,7 +117,8 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
                 value={memberNama}
                 onChange={(e) => setMemberNama(e.target.value)}
                 placeholder="Contoh: Siti Aisyah"
-                className="w-full border border-slate-300 bg-white rounded-lg px-2.5 py-1.5 text-xs text-slate-855 focus:outline-none"
+                className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 text-xs text-slate-855 focus:outline-none"
+                autoComplete="off"
               />
             </div>
             <div>
@@ -129,7 +130,8 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
                 value={memberNik}
                 onChange={(e) => setMemberNik(e.target.value)}
                 placeholder="Masukkan angka NIK..."
-                className="w-full border border-slate-300 bg-white rounded-lg px-2.5 py-1.5 text-xs text-slate-855 focus:outline-none"
+                className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 text-xs text-slate-855 focus:outline-none"
+                autoComplete="off"
               />
             </div>
             <div>
@@ -141,7 +143,8 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
                 value={memberPekerjaan}
                 onChange={(e) => setMemberPekerjaan(e.target.value)}
                 placeholder="Contoh: Wiraswasta, Pelajar..."
-                className="w-full border border-slate-300 bg-white rounded-lg px-2.5 py-1.5 text-xs text-slate-855 focus:outline-none"
+                className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 text-xs text-slate-855 focus:outline-none"
+                autoComplete="off"
               />
             </div>
           </div>
@@ -155,7 +158,8 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
                 required
                 value={memberTglLahir}
                 onChange={(e) => setMemberTglLahir(e.target.value)}
-                className="w-full border border-slate-300 bg-white rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none"
+                className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none"
+                autoComplete="off"
               />
             </div>
             <div>
@@ -164,7 +168,7 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
                 id="mhub"
                 value={memberHubungan}
                 onChange={(e) => setMemberHubungan(e.target.value as any)}
-                className="w-full border border-slate-300 bg-white rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none"
+                className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none"
               >
                 <option value="Suami">Suami</option>
                 <option value="Istri">Istri</option>
@@ -179,7 +183,7 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
                 id="mstatus"
                 value={memberStatusKawin}
                 onChange={(e) => setMemberStatusKawin(e.target.value as any)}
-                className="w-full border border-slate-300 bg-white rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none"
+                className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none"
               >
                 <option value="Belum Kawin">Belum Kawin</option>
                 <option value="Kawin">Kawin</option>
@@ -193,7 +197,7 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
                 id="mpend"
                 value={memberPendidikan}
                 onChange={(e) => setMemberPendidikan(e.target.value as any)}
-                className="w-full border border-slate-300 bg-white rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none"
+                className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2 py-1 text-xs text-slate-800 focus:outline-none"
               >
                 <option value="Tidak Sekolah">Tidak Sekolah</option>
                 <option value="SD">SD</option>
@@ -389,7 +393,7 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
                   id="edit-status-kawin"
                   value={editStatusKawin}
                   onChange={(e) => setEditStatusKawin(e.target.value as any)}
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-slate-100 text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
                 >
                   <option value="Belum Kawin">Belum Kawin</option>
                   <option value="Kawin">Kawin</option>
@@ -404,7 +408,7 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
                   id="edit-pendidikan"
                   value={editPendidikan}
                   onChange={(e) => setEditPendidikan(e.target.value as any)}
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-slate-100 text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
                 >
                   <option value="Tidak Sekolah">Tidak Sekolah</option>
                   <option value="SD">SD</option>

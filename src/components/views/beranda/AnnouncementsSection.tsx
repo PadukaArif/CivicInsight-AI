@@ -134,6 +134,7 @@ export const AnnouncementsList: React.FC<AnnouncementsListProps> = ({
                   alert('Pengumuman berhasil diperbarui!');
                 }
               }}
+              autoComplete="off"
               className="space-y-4 text-xs"
             >
               <div>
@@ -143,7 +144,8 @@ export const AnnouncementsList: React.FC<AnnouncementsListProps> = ({
                   required
                   value={editAnnJudul}
                   onChange={(e) => setEditAnnJudul(e.target.value)}
-                  className="w-full border border-slate-305 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                  className="w-full border border-slate-350 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none bg-slate-100"
+                  autoComplete="off"
                 />
               </div>
 
@@ -153,7 +155,7 @@ export const AnnouncementsList: React.FC<AnnouncementsListProps> = ({
                   <select
                     value={editAnnKategori}
                     onChange={(e) => setEditAnnKategori(e.target.value as any)}
-                    className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-white text-slate-800 focus:outline-none"
+                    className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-slate-100 text-slate-800 focus:outline-none"
                   >
                     <option value="Umum">Umum</option>
                     <option value="Penting">Penting</option>
@@ -165,7 +167,7 @@ export const AnnouncementsList: React.FC<AnnouncementsListProps> = ({
                   <select
                     value={editAnnUrgensi}
                     onChange={(e) => setEditAnnUrgensi(e.target.value as any)}
-                    className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-white text-slate-800 focus:outline-none"
+                    className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-slate-100 text-slate-800 focus:outline-none"
                   >
                     <option value="normal">Normal</option>
                     <option value="high">Darurat</option>
@@ -180,7 +182,8 @@ export const AnnouncementsList: React.FC<AnnouncementsListProps> = ({
                   required
                   value={editAnnKonten}
                   onChange={(e) => setEditAnnKonten(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none"
+                  className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none bg-slate-100"
+                  autoComplete="off"
                 />
               </div>
 
@@ -237,7 +240,7 @@ export const AddAnnouncementForm: React.FC<AddAnnouncementFormProps> = ({
         <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Terbitkan Pengumuman</h3>
       </div>
 
-      <form onSubmit={handleSubmitAnnouncement} className="space-y-4">
+      <form onSubmit={handleSubmitAnnouncement} autoComplete="off" className="space-y-4">
         <div>
           <label htmlFor="judul-pengumuman" className="block text-xs font-bold text-slate-700 mb-1">
             Judul Pengumuman:
@@ -249,7 +252,8 @@ export const AddAnnouncementForm: React.FC<AddAnnouncementFormProps> = ({
             value={judul}
             onChange={(e) => setJudul(e.target.value)}
             placeholder="Contoh: Jadwal Ronda Malam Baru"
-            className="w-full border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+            className="w-full border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary bg-slate-100"
+            autoComplete="off"
           />
         </div>
 
@@ -262,7 +266,7 @@ export const AddAnnouncementForm: React.FC<AddAnnouncementFormProps> = ({
               id="kategori-pengumuman"
               value={kategori}
               onChange={(e) => setKategori(e.target.value as any)}
-              className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-white text-slate-855 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
+              className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-slate-100 text-slate-855 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
             >
               <option value="Umum">Umum</option>
               <option value="Penting">Penting</option>
@@ -277,7 +281,7 @@ export const AddAnnouncementForm: React.FC<AddAnnouncementFormProps> = ({
               id="urgensi-pengumuman"
               value={urgensi}
               onChange={(e) => setUrgensi(e.target.value as any)}
-              className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-white text-slate-855 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
+              className="w-full border border-slate-300 rounded-xl px-2 py-2 bg-slate-100 text-slate-855 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
             >
               <option value="normal">Normal</option>
               <option value="high">Darurat</option>
@@ -296,7 +300,8 @@ export const AddAnnouncementForm: React.FC<AddAnnouncementFormProps> = ({
             value={konten}
             onChange={(e) => setKonten(e.target.value)}
             placeholder="Tulis rincian pengumuman..."
-            className="w-full border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+            className="w-full border border-slate-300 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary bg-slate-100"
+            autoComplete="off"
           />
         </div>
 

@@ -92,6 +92,7 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
             form.reset();
             alert('Kartu Keluarga (KK) baru berhasil didaftarkan ke sistem!');
           }}
+          autoComplete="off"
           className="grid grid-cols-1 md:grid-cols-2 gap-3"
         >
           <div>
@@ -100,7 +101,8 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
               type="text"
               placeholder="Nama Lengkap Kepala Keluarga"
               required
-              className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-civic-primary"
+              className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-civic-primary"
+              autoComplete="off"
             />
           </div>
           <div>
@@ -109,7 +111,8 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
               type="text"
               placeholder="Nomor KK (16 Digit)"
               required
-              className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-civic-primary"
+              className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-civic-primary"
+              autoComplete="off"
             />
           </div>
           <div>
@@ -118,7 +121,8 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
               type="text"
               placeholder="Alamat Lengkap / No. Rumah"
               required
-              className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-civic-primary"
+              className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-civic-primary"
+              autoComplete="off"
             />
           </div>
           <div>
@@ -127,7 +131,8 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
               type="text"
               placeholder="Nomor HP Aktif"
               required
-              className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-civic-primary"
+              className="w-full border border-slate-300 bg-slate-100 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-civic-primary"
+              autoComplete="off"
             />
           </div>
           <div className="md:col-span-2">
@@ -153,7 +158,8 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
             value={adminSearch}
             onChange={(e) => setAdminSearch(e.target.value)}
             placeholder="Ketik nama warga, nama anak, istri, atau nomor KK untuk memfilter..."
-            className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+            className="w-full border border-slate-300 bg-slate-100 rounded-xl pl-10 pr-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-civic-primary"
+            autoComplete="off"
           />
           <Search size={16} className="absolute left-3.5 top-3.5 text-slate-400" />
         </div>
@@ -358,6 +364,7 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
                             setAdminAddMemberHouseholdId(null);
                             alert('Anggota keluarga baru berhasil ditambahkan!');
                           }}
+                          autoComplete="off"
                           className="bg-white border border-slate-200 rounded-xl p-3.5 space-y-3 shadow-3xs text-left"
                         >
                           <span className="block font-bold text-slate-800 text-[11px] uppercase tracking-wider">Tambah Anggota Baru</span>
@@ -365,26 +372,26 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <div>
                               <label className="block text-[9px] font-bold text-slate-500 mb-0.5">Nama Lengkap:</label>
-                              <input id={`admin-add-nama-${house.id}`} required type="text" className="w-full border border-slate-300 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none" />
+                              <input id={`admin-add-nama-${house.id}`} required type="text" autoComplete="off" className="w-full border border-slate-300 bg-slate-100 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none" />
                             </div>
                             <div>
                               <label className="block text-[9px] font-bold text-slate-500 mb-0.5">NIK KTP:</label>
-                              <input id={`admin-add-nik-${house.id}`} required type="text" className="w-full border border-slate-300 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none" />
+                              <input id={`admin-add-nik-${house.id}`} required type="text" autoComplete="off" className="w-full border border-slate-300 bg-slate-100 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none" />
                             </div>
                             <div>
                               <label className="block text-[9px] font-bold text-slate-500 mb-0.5">Pekerjaan:</label>
-                              <input id={`admin-add-job-${house.id}`} type="text" className="w-full border border-slate-300 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none" />
+                              <input id={`admin-add-job-${house.id}`} type="text" autoComplete="off" className="w-full border border-slate-300 bg-slate-100 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none" />
                             </div>
                           </div>
 
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                             <div>
                               <label className="block text-[9px] font-bold text-slate-500 mb-0.5">Tgl Lahir:</label>
-                              <input id={`admin-add-tgl-${house.id}`} required type="date" className="w-full border border-slate-300 rounded-md px-1.5 py-0.5 text-xs text-slate-800 focus:outline-none" />
+                              <input id={`admin-add-tgl-${house.id}`} required type="date" autoComplete="off" className="w-full border border-slate-300 bg-slate-100 rounded-md px-1.5 py-0.5 text-xs text-slate-800 focus:outline-none" />
                             </div>
                             <div>
                               <label className="block text-[9px] font-bold text-slate-500 mb-0.5">Hubungan:</label>
-                              <select id={`admin-add-hub-${house.id}`} className="w-full border border-slate-300 rounded-md px-1.5 py-0.5 text-xs text-slate-800 bg-white focus:outline-none">
+                              <select id={`admin-add-hub-${house.id}`} className="w-full border border-slate-300 rounded-md px-1.5 py-0.5 text-xs text-slate-800 bg-slate-100 focus:outline-none">
                                 <option value="Suami">Suami</option>
                                 <option value="Istri">Istri</option>
                                 <option value="Anak">Anak</option>
@@ -394,7 +401,7 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
                             </div>
                             <div>
                               <label className="block text-[9px] font-bold text-slate-500 mb-0.5">Status:</label>
-                              <select id={`admin-add-status-${house.id}`} className="w-full border border-slate-300 rounded-md px-1.5 py-0.5 text-xs text-slate-800 bg-white focus:outline-none">
+                              <select id={`admin-add-status-${house.id}`} className="w-full border border-slate-300 rounded-md px-1.5 py-0.5 text-xs text-slate-800 bg-slate-100 focus:outline-none">
                                 <option value="Belum Kawin">Belum Kawin</option>
                                 <option value="Kawin">Kawin</option>
                                 <option value="Cerai Hidup">Cerai Hidup</option>
@@ -403,7 +410,7 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
                             </div>
                             <div>
                               <label className="block text-[9px] font-bold text-slate-500 mb-0.5">Pendidikan:</label>
-                              <select id={`admin-add-pend-${house.id}`} className="w-full border border-slate-300 rounded-md px-1.5 py-0.5 text-xs text-slate-800 bg-white focus:outline-none">
+                              <select id={`admin-add-pend-${house.id}`} className="w-full border border-slate-300 rounded-md px-1.5 py-0.5 text-xs text-slate-800 bg-slate-100 focus:outline-none">
                                 <option value="Tidak Sekolah">Tidak Sekolah</option>
                                 <option value="SD">SD</option>
                                 <option value="SMP">SMP</option>
@@ -501,7 +508,7 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
                   id="edit-status-kawin"
                   value={editStatusKawin}
                   onChange={(e) => setEditStatusKawin(e.target.value as any)}
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-slate-100 text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
                 >
                   <option value="Belum Kawin">Belum Kawin</option>
                   <option value="Kawin">Kawin</option>
@@ -516,7 +523,7 @@ export const HouseholdCreationPanel: React.FC<HouseholdCreationPanelProps> = ({
                   id="edit-pendidikan"
                   value={editPendidikan}
                   onChange={(e) => setEditPendidikan(e.target.value as any)}
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
+                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-slate-100 text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-civic-primary"
                 >
                   <option value="Tidak Sekolah">Tidak Sekolah</option>
                   <option value="SD">SD</option>
