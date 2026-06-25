@@ -21,9 +21,10 @@ export function App() {
 
   React.useEffect(() => {
     const originalAlert = window.alert;
-    window.alert = (message: string) => {
+    window.alert = (message?: any) => {
+      const msgText = message !== undefined && message !== null ? String(message) : '';
       let type: 'info' | 'success' | 'error' = 'success';
-      const msgLower = String(message).toLowerCase();
+      const msgLower = msgText.toLowerCase();
       if (
         msgLower.includes('gagal') ||
         msgLower.includes('salah') ||

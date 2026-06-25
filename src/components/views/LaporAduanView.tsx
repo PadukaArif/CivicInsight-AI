@@ -289,7 +289,7 @@ export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
               <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Diproses</span>
             </div>
             <div className="bg-civic-surface p-4 rounded-xl border border-slate-200 text-center">
-              <span className="block text-2xl font-black text-emerald-700">{stats.selesay || stats.selesai}</span>
+              <span className="block text-2xl font-black text-emerald-700">{stats.selesai}</span>
               <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Selesai</span>
             </div>
           </div>

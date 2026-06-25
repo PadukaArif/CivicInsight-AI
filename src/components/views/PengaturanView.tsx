@@ -97,8 +97,10 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
       return;
     }
     
-    onEditHouseholdKk(citizenHousehold.id, profileKk.trim());
-    alert('Nomor KK berhasil disimpan!');
+    if (citizenHousehold) {
+      onEditHouseholdKk(citizenHousehold.id, profileKk.trim());
+      alert('Nomor KK berhasil disimpan!');
+    }
   };
 
   return (

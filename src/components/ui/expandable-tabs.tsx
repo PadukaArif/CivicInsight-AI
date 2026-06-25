@@ -49,7 +49,7 @@ const spanVariants = {
   exit: { width: 0, opacity: 0 },
 };
 
-const transition = { delay: 0.1, type: "spring", bounce: 0, duration: 0.6 };
+const transition = { delay: 0.1, type: "spring" as const, bounce: 0, duration: 0.6 };
 
 export function ExpandableTabs({
   tabs,
@@ -66,14 +66,14 @@ export function ExpandableTabs({
   }, [tabs, activeTabId]);
 
   const [selected, setSelected] = React.useState<number | null>(activeIndex);
-  const outsideClickRef = React.useRef(null);
+  const outsideClickRef = React.useRef<HTMLDivElement>(null);
 
   // Sync selected index with activeTabId prop when it changes
   React.useEffect(() => {
     setSelected(activeIndex);
   }, [activeIndex]);
 
-  useOnClickOutside(outsideClickRef, () => {
+  useOnClickOutside(outsideClickRef as React.RefObject<HTMLElement>, () => {
     setSelected(null);
     onChange?.(null);
   });

@@ -17,6 +17,9 @@ export interface Aduan {
   tanggal: string;
   tanggapanAdmin?: string;
   tanggalTanggapan?: string;
+  wargaId?: number | string;
+  account_id?: number | string;
+  tanggapan?: string;
 }
 
 export interface Fact {

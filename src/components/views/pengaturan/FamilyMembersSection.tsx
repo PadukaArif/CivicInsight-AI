@@ -3,7 +3,7 @@ import { User, Plus, Users, CreditCard, Calendar, BookOpen, Heart, Edit, Trash2,
 import { FamilyMember, Household } from '../../../types';
 
 interface FamilyMembersSectionProps {
-  household: Household;
+  household?: Household;
   isAdmin: boolean;
   onAddFamilyMember: (member: Omit<FamilyMember, 'id'>, householdId: number) => void;
   onDeleteFamilyMember: (id: number) => void;
@@ -60,6 +60,11 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
     }
     if (isNaN(Number(memberNik))) {
       alert('Nomor NIK harus berupa angka!');
+      return;
+    }
+
+    if (!household) {
+      alert('Data kartu keluarga tidak ditemukan!');
       return;
     }
 
@@ -426,10 +431,12 @@ export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  onEditFamilyMember(household.id, editingMember.id, editStatusKawin, editPendidikan);
-                  setShowEditModal(false);
-                  setEditingMember(null);
-                  alert('Status & pendidikan anggota keluarga berhasil diperbarui!');
+                  if (household && editingMember) {
+                    onEditFamilyMember(household.id, editingMember.id, editStatusKawin, editPendidikan);
+                    setShowEditModal(false);
+                    setEditingMember(null);
+                    alert('Status & pendidikan anggota keluarga berhasil diperbarui!');
+                  }
                 }}
                 className="bg-civic-primary hover:bg-teal-850 text-white text-xs font-bold py-2 px-4 rounded-xl cursor-pointer"
               >

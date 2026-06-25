@@ -1,9 +1,9 @@
 import React from 'react';
-import { Announcement, LedgerTransaction } from '../../types';
+import type { Announcement, LedgerTransaction } from '../../types';
 import { Megaphone, Trash2, Plus, Users, Wallet, FileText, Calendar, Award, PhoneCall, TrendingUp, TrendingDown, Shield } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
-// Import default assets untuk dokumentasi kegiatan
+// Import default activity images
 import kerjaBaktiImg from '../../assets/kerja_bakti.png';
 import gotongRoyongImg from '../../assets/gotong_royong.png';
 import rondaMalamImg from '../../assets/ronda_malam.png';

@@ -836,7 +836,7 @@ Jawab dalam Bahasa Indonesia, singkat dan ramah. Format dengan Markdown (**tebal
                           setEditingFact(fact);
                           setEditFactJudul(fact.judul);
                           setEditFactPenjelasan(fact.penjelasan);
-                          setEditFactStatus(fact.status);
+                          setEditFactStatus(fact.status === 'belum_verifikasi' ? 'fakta' : fact.status);
                           setEditFactSumber(fact.sumber || '');
                         }}
                         className="text-slate-400 hover:text-blue-650 p-1.5 rounded-lg hover:bg-slate-50 cursor-pointer"
