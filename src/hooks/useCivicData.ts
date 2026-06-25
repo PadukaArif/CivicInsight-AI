@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Announcement, Aduan, Fact, Rumor, ChatMessage, LedgerTransaction, FamilyMember, Household } from '../types';
 
-const BASE_URL = process.env.VITE_API_URL || 'https://civicinsight-backend-production.up.railway.app';
+const BASE_URL = process.env.VITE_API_URL || 'https://civicinsight-ai-backend.up.railway.app';
 
 export function useCivicData() {
   // ======================== STATE GLOBAL SIMULASI ========================

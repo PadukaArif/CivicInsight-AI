@@ -2,7 +2,7 @@ import React from 'react';
 import { Fact, Rumor } from '../../types';
 import { ShieldCheck, ShieldAlert, Search, Send, Plus, Trash2, HelpCircle, Check, X, FileText, Bot, Loader2, Edit } from 'lucide-react';
 
-const BASE_URL = process.env.VITE_API_URL || 'https://civicinsight-backend-production.up.railway.app';
+const BASE_URL = process.env.VITE_API_URL || 'https://civicinsight-ai-backend.up.railway.app';
 
 /**
  * Interface props untuk CekFaktaView

@@ -16,7 +16,7 @@ const result = await Bun.build({
   sourcemap: "linked",
   define: {
     "process.env.NODE_ENV": JSON.stringify("production"),
-    "process.env.VITE_API_URL": JSON.stringify(process.env.VITE_API_URL || "https://civicinsight-backend-production.up.railway.app"),
+    "process.env.VITE_API_URL": JSON.stringify(process.env.VITE_API_URL || "https://civicinsight-ai-backend.up.railway.app"),
   },
 });
 
