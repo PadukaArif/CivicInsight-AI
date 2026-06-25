@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, Trash2, Plus, Check } from 'lucide-react';
+import { Award, Trash2, Check } from 'lucide-react';
 
 interface QuizWidgetProps {
   isAdmin: boolean;

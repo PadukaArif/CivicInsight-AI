@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, ChevronDown, Home, Sparkles, ShieldCheck, Megaphone, Settings, ClipboardList, ShieldAlert, Bot, TrendingUp, MapPin, LogOut } from 'lucide-react';
+import { Menu, Home, Sparkles, ShieldCheck, Megaphone, Settings, ClipboardList, ShieldAlert, Bot, TrendingUp, MapPin, LogOut } from 'lucide-react';
 import { ExpandableTabs } from '../ui/expandable-tabs';
 import logoImg from '../../logo.png';
 
@@ -49,20 +49,9 @@ const adminMenuItems: MenuItem[] = [
   { id: 'pengaturan', label: 'Pengaturan', icon: Settings },
 ];
 
-// Daftar RT/RW aktif dalam simulasi
-const rtRwList = [
-  'RT 01 / RW 02',
-  'RT 02 / RW 02',
-  'RT 03 / RW 02',
-  'RT 04 / RW 02',
-  'RT 05 / RW 02',
-];
-
 export const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
   isAdmin,
-  activeRtRw,
-  onRtRwChange,
   currentTabTitle,
   currentTab,
   onTabChange,

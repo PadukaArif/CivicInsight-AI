@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogIn, User, Shield, Lock, Mail, CreditCard, Sparkles, UserPlus, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { LogIn, User, Shield, Lock, Mail, CreditCard, UserPlus, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import logoImg from '../../logo.png';
 
 interface LoginViewProps {

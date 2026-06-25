@@ -12,7 +12,6 @@ interface FamilyMembersSectionProps {
 
 export const FamilyMembersSection: React.FC<FamilyMembersSectionProps> = ({
   household,
-  isAdmin,
   onAddFamilyMember,
   onDeleteFamilyMember,
   onEditFamilyMember,

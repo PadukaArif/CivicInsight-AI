@@ -1,6 +1,6 @@
 import React from 'react';
 import { Household } from '../../types';
-import { BarChart3, TrendingUp, ShieldAlert, Sparkles, Smile, Meh, Frown, Award, CheckCircle2, AlertTriangle, Activity } from 'lucide-react';
+import { BarChart3, TrendingUp, ShieldAlert, Sparkles, Smile, Meh, Frown, Award, CheckCircle2, Activity } from 'lucide-react';
 
 export interface StatistikViewProps {
   households: Household[];
@@ -15,10 +15,7 @@ export interface StatistikViewProps {
 export const StatistikView: React.FC<StatistikViewProps> = ({
   households,
   pollResults,
-  userVoted,
-  onVoteComfort,
   aduanList,
-  poinWarga,
   approvedUsers = [],
 }) => {
   // 1. hitung statistik pekerjaan secara dinamis dari database KK

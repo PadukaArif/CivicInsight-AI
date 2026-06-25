@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Search, Users, CreditCard, MapPin, ChevronUp, ChevronDown, Edit, Trash2, Eye, EyeOff, Calendar, BookOpen, Heart } from 'lucide-react';
+import { Plus, Search, Users, CreditCard, MapPin, ChevronUp, ChevronDown, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { FamilyMember, Household } from '../../../types';
 
 interface HouseholdCreationPanelProps {

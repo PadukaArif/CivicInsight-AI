@@ -38,9 +38,7 @@ export interface PengaturanViewProps {
 
 export const PengaturanView: React.FC<PengaturanViewProps> = ({
   isAdmin,
-  onToggleRole,
   activeRtRw,
-  onRtRwChange,
   households,
   onAddFamilyMember,
   onDeleteFamilyMember,
@@ -58,7 +56,6 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
   onDeleteCitizen,
   onAddHousehold,
   onDeleteHousehold,
-  onResetAllData,
 }) => {
   // Simulasi profil mandiri Kepala Keluarga aktif yang login
   const citizenHousehold = React.useMemo(() => {

@@ -1,7 +1,5 @@
 import React from 'react';
 import { DashboardLayout } from './components/layout/DashboardLayout';
-import type { Announcement, Aduan, Fact, Rumor, ChatMessage, LedgerTransaction, FamilyMember, Household } from './types';
-
 // Import komponen-komponen view yang sudah modular
 import { BerandaView } from './components/views/BerandaView';
 import { KonsultasiAIView } from './components/views/KonsultasiAIView';
