@@ -237,7 +237,7 @@ export function useCivicData() {
 
   // ======================== API INTEGRATION HELPERS ========================
   const refreshAllData = async () => {
-    const BASE_URL = 'http://localhost:4000';
+    // BASE_URL is now global
     try {
       // 1. Fetch approved users
       const approvedRes = await fetch(`${BASE_URL}/auth/approved`);
@@ -385,7 +385,7 @@ export function useCivicData() {
 
   const fetchUserVoted = async (userId: number) => {
     try {
-      const res = await fetch(`http://localhost:4000/poll/user/${userId}`);
+      const res = await fetch(`${BASE_URL}/poll/user/${userId}`);
       const data = await res.json();
       if (data.success) {
         setUserVoted(data.choice);
@@ -412,7 +412,7 @@ export function useCivicData() {
   // A. Kredensial & Autentikasi
   const handleLoginWarga = async (email: string, pass: string) => {
     try {
-      const res = await fetch('http://localhost:4000/auth/login', {
+      const res = await fetch(`${BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password: pass })
@@ -442,7 +442,7 @@ export function useCivicData() {
 
   const handleRegisterWarga = async (name: string, email: string, nik: string, pass: string) => {
     try {
-      const res = await fetch('http://localhost:4000/auth/register', {
+      const res = await fetch(`${BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -470,14 +470,14 @@ export function useCivicData() {
 
   const handleApproveRegistration = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:4000/auth/approve/${id}`, { method: 'POST' });
+      const res = await fetch(`${BASE_URL}/auth/approve/${id}`, { method: 'POST' });
       const data = await res.json();
       if (data.success) {
         const user = pendingRegistrations.find(u => String(u.id) === String(id));
         if (user) {
           const nikExists = households.some(h => (h.members || []).some(m => m.nik === user.nik));
           if (!nikExists) {
-            const hhRes = await fetch('http://localhost:4000/households', {
+            const hhRes = await fetch(`${BASE_URL}/households`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -490,7 +490,7 @@ export function useCivicData() {
             const hhData = await hhRes.json();
             if (hhData.success) {
               const hhId = hhData.data.id;
-              await fetch(`http://localhost:4000/households/${hhId}/members`, {
+              await fetch(`${BASE_URL}/households/${hhId}/members`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -514,7 +514,7 @@ export function useCivicData() {
 
   const handleRejectRegistration = async (id: string) => {
     try {
-      await fetch(`http://localhost:4000/auth/reject/${id}`, { method: 'POST' });
+      await fetch(`${BASE_URL}/auth/reject/${id}`, { method: 'POST' });
       await refreshAllData();
     } catch (e) {
       console.error(e);
@@ -523,7 +523,7 @@ export function useCivicData() {
 
   const handleUpdateCitizenPoints = async (userId: string, points: number) => {
     try {
-      await fetch(`http://localhost:4000/auth/profile/${userId}/points`, {
+      await fetch(`${BASE_URL}/auth/profile/${userId}/points`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ points })
@@ -544,7 +544,7 @@ export function useCivicData() {
 
   const handleAddQuizQuestion = async (question: string, options: Array<{ key: string; text: string }>, correctAnswer: string) => {
     try {
-      await fetch('http://localhost:4000/quiz/questions', {
+      await fetch(`${BASE_URL}/quiz/questions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question, options, correctAnswer })
@@ -557,7 +557,7 @@ export function useCivicData() {
 
   const handleDeleteQuizQuestion = async (id: number) => {
     try {
-      await fetch(`http://localhost:4000/quiz/questions/${id}`, { method: 'DELETE' });
+      await fetch(`${BASE_URL}/quiz/questions/${id}`, { method: 'DELETE' });
       await refreshAllData();
     } catch (e) {
       console.error(e);
@@ -610,7 +610,7 @@ export function useCivicData() {
     urgensi: 'high' | 'normal'
   ) => {
     try {
-      await fetch('http://localhost:4000/announcements', {
+      await fetch(`${BASE_URL}/announcements`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: judul, content: konten, category: kategori, urgency: urgensi })
@@ -624,7 +624,7 @@ export function useCivicData() {
   // D. Menghapus Pengumuman (Admin Only)
   const handleDeleteAnnouncement = async (id: number) => {
     try {
-      await fetch(`http://localhost:4000/announcements/${id}`, { method: 'DELETE' });
+      await fetch(`${BASE_URL}/announcements/${id}`, { method: 'DELETE' });
       await refreshAllData();
     } catch (e) {
       console.error(e);
@@ -668,7 +668,7 @@ PENTING:
 - Jika ditanya tentang berita nasional, isu sosial, atau kesehatan umum, arahkan warga ke menu "Cek Fakta & Isu" di navigasi atas
 - Fokus HANYA pada urusan administrasi dan pelayanan RT/RW`;
 
-      const res = await fetch('http://localhost:4000/ai/chat', {
+      const res = await fetch(`${BASE_URL}/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -705,7 +705,7 @@ PENTING:
         }
       } else if (lower.includes('bansos') || lower.includes('dtks') || lower.includes('bpnt') || lower.includes('pkh')) {
         try {
-          const res = await fetch("http://localhost:4000/news/bansos");
+          const res = await fetch(`${BASE_URL}/news/bansos`);
           const data = await res.json();
           const userBansos = data.find((item: any) => item.nama.toLowerCase().includes(currentUser?.nama?.toLowerCase()) || currentUser?.nama?.toLowerCase().includes(item.nama.toLowerCase()));
           if (userBansos) {
@@ -744,7 +744,7 @@ PENTING:
   // F. Melaporkan Rumor Isu Baru (Warga)
   const handleSubmitRumor = async (konten: string) => {
     try {
-      await fetch('http://localhost:4000/rumors', {
+      await fetch(`${BASE_URL}/rumors`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -762,7 +762,7 @@ PENTING:
   // G. Memverifikasi Rumor Aduan Warga (Admin Only)
   const handleVerifyRumor = async (id: number, status: 'fakta' | 'hoaks', penjelasan: string) => {
     try {
-      await fetch(`http://localhost:4000/rumors/${id}/verify`, {
+      await fetch(`${BASE_URL}/rumors/${id}/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -781,7 +781,7 @@ PENTING:
   // H. Menghapus Rumor (Admin Only)
   const handleDeleteRumor = async (id: number) => {
     try {
-      await fetch(`http://localhost:4000/rumors/${id}`, { method: 'DELETE' });
+      await fetch(`${BASE_URL}/rumors/${id}`, { method: 'DELETE' });
       await refreshAllData();
     } catch (e) {
       console.error(e);
@@ -791,7 +791,7 @@ PENTING:
   // I. Mempublikasikan Fakta Secara Langsung (Admin Only)
   const handleAddFact = async (judul: string, penjelasan: string, status: 'fakta' | 'hoaks', sumber?: string) => {
     try {
-      await fetch('http://localhost:4000/facts', {
+      await fetch(`${BASE_URL}/facts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -810,7 +810,7 @@ PENTING:
   // J. Menghapus Publikasi Fakta (Admin Only)
   const handleDeleteFact = async (id: number) => {
     try {
-      await fetch(`http://localhost:4000/facts/${id}`, { method: 'DELETE' });
+      await fetch(`${BASE_URL}/facts/${id}`, { method: 'DELETE' });
       await refreshAllData();
     } catch (e) {
       console.error(e);
@@ -820,7 +820,7 @@ PENTING:
   // K. Membuat Aduan Baru (Warga)
   const handleSubmitAduan = async (kategori: string, lokasi: string, deskripsi: string) => {
     try {
-      await fetch('http://localhost:4000/aduan', {
+      await fetch(`${BASE_URL}/aduan`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -839,7 +839,7 @@ PENTING:
   // L. Merespons & Mengubah Status Aduan Warga (Admin Only)
   const handleUpdateAduanStatus = async (id: number, status: 'Terkirim' | 'Diproses' | 'Selesai', response?: string) => {
     try {
-      await fetch(`http://localhost:4000/aduan/${id}`, {
+      await fetch(`${BASE_URL}/aduan/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, tanggapan: response })
@@ -853,7 +853,7 @@ PENTING:
   // M. Menghapus Aduan (Admin Only)
   const handleDeleteAduan = async (id: number) => {
     try {
-      await fetch(`http://localhost:4000/aduan/${id}`, { method: 'DELETE' });
+      await fetch(`${BASE_URL}/aduan/${id}`, { method: 'DELETE' });
       await refreshAllData();
     } catch (e) {
       console.error(e);
@@ -863,7 +863,7 @@ PENTING:
   // N. Menambahkan Anggota Keluarga Baru (Warga & Admin)
   const handleAddFamilyMember = async (member: Omit<FamilyMember, 'id'>, householdId: number = 1) => {
     try {
-      await fetch(`http://localhost:4000/households/${householdId}/members`, {
+      await fetch(`${BASE_URL}/households/${householdId}/members`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -886,7 +886,7 @@ PENTING:
     const hh = households.find((h) => (h.members || []).some((m) => m.id === id));
     if (!hh) return;
     try {
-      await fetch(`http://localhost:4000/households/${hh.id}/members/${id}`, { method: 'DELETE' });
+      await fetch(`${BASE_URL}/households/${hh.id}/members/${id}`, { method: 'DELETE' });
       await refreshAllData();
     } catch (e) {
       console.error(e);
@@ -896,7 +896,7 @@ PENTING:
   // P. Mengedit Pengumuman (Admin Only)
   const handleEditAnnouncement = async (id: number, judul: string, konten: string, kategori: 'Penting' | 'Umum' | 'Kegiatan', urgensi: 'high' | 'normal') => {
     try {
-      await fetch(`http://localhost:4000/announcements/${id}`, {
+      await fetch(`${BASE_URL}/announcements/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: judul, content: konten, category: kategori, urgency: urgensi })
@@ -910,7 +910,7 @@ PENTING:
   // Q. CRUD Kontak Darurat (Admin Only)
   const handleAddContact = async (nama: string, nomor: string) => {
     try {
-      await fetch('http://localhost:4000/contacts', {
+      await fetch(`${BASE_URL}/contacts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nama, nomor })
@@ -922,7 +922,7 @@ PENTING:
   };
   const handleEditContact = async (id: number, nama: string, nomor: string) => {
     try {
-      await fetch(`http://localhost:4000/contacts/${id}`, {
+      await fetch(`${BASE_URL}/contacts/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nama, nomor })
@@ -934,7 +934,7 @@ PENTING:
   };
   const handleDeleteContact = async (id: number) => {
     try {
-      await fetch(`http://localhost:4000/contacts/${id}`, { method: 'DELETE' });
+      await fetch(`${BASE_URL}/contacts/${id}`, { method: 'DELETE' });
       await refreshAllData();
     } catch (e) {
       console.error(e);
@@ -944,7 +944,7 @@ PENTING:
   // R. CRUD Transaksi Kas (Admin Only)
   const handleAddTransaction = async (tanggal: string, keterangan: string, jenis: 'pemasukan' | 'pengeluaran', jumlah: number) => {
     try {
-      await fetch('http://localhost:4000/kas', {
+      await fetch(`${BASE_URL}/kas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tanggal, keterangan, jenis, jumlah })
@@ -956,7 +956,7 @@ PENTING:
   };
   const handleEditTransaction = async (id: number, tanggal: string, keterangan: string, jenis: 'pemasukan' | 'pengeluaran', jumlah: number) => {
     try {
-      await fetch(`http://localhost:4000/kas/${id}`, {
+      await fetch(`${BASE_URL}/kas/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tanggal, keterangan, jenis, jumlah })
@@ -968,7 +968,7 @@ PENTING:
   };
   const handleDeleteTransaction = async (id: number) => {
     try {
-      await fetch(`http://localhost:4000/kas/${id}`, { method: 'DELETE' });
+      await fetch(`${BASE_URL}/kas/${id}`, { method: 'DELETE' });
       await refreshAllData();
     } catch (e) {
       console.error(e);
@@ -978,7 +978,7 @@ PENTING:
   // S. Edit Klarifikasi Fakta (Admin Only)
   const handleEditFact = async (id: number, judul: string, penjelasan: string, status: 'fakta' | 'hoaks', sumber?: string) => {
     try {
-      await fetch(`http://localhost:4000/facts/${id}`, {
+      await fetch(`${BASE_URL}/facts/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ judul, penjelasan, status, sumber })
@@ -992,7 +992,7 @@ PENTING:
   // T. Edit Anggota Keluarga (Terbatas: Hanya Status & Pendidikan)
   const handleEditFamilyMember = async (householdId: number, memberId: number, statusKawin: FamilyMember['statusKawin'], pendidikan: FamilyMember['pendidikan']) => {
     try {
-      await fetch(`http://localhost:4000/households/${householdId}/members/${memberId}`, {
+      await fetch(`${BASE_URL}/households/${householdId}/members/${memberId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ statusKawin, pendidikan })
@@ -1008,7 +1008,7 @@ PENTING:
     const hh = households.find((h) => h.id === householdId);
     if (!hh) return;
     try {
-      await fetch(`http://localhost:4000/households/${householdId}`, {
+      await fetch(`${BASE_URL}/households/${householdId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1027,7 +1027,7 @@ PENTING:
   // V. Hapus Akun Warga
   const handleDeleteCitizen = async (userId: string) => {
     try {
-      await fetch(`http://localhost:4000/auth/reject/${userId}`, { method: 'POST' });
+      await fetch(`${BASE_URL}/auth/reject/${userId}`, { method: 'POST' });
       await refreshAllData();
     } catch (e) {
       console.error(e);
@@ -1037,7 +1037,7 @@ PENTING:
   // W. Tambah Kartu Keluarga Baru
   const handleAddHousehold = async (kepalaKeluarga: string, noKk: string, alamat: string, noHp: string) => {
     try {
-      const res = await fetch('http://localhost:4000/households', {
+      const res = await fetch(`${BASE_URL}/households`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1050,7 +1050,7 @@ PENTING:
       const data = await res.json();
       if (data.success) {
         const hhId = data.data.id;
-        await fetch(`http://localhost:4000/households/${hhId}/members`, {
+        await fetch(`${BASE_URL}/households/${hhId}/members`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1072,7 +1072,7 @@ PENTING:
   // X. Hapus Kartu Keluarga
   const handleDeleteHousehold = async (id: number) => {
     try {
-      await fetch(`http://localhost:4000/households/${id}`, { method: 'DELETE' });
+      await fetch(`${BASE_URL}/households/${id}`, { method: 'DELETE' });
       await refreshAllData();
     } catch (e) {
       console.error(e);
@@ -1088,7 +1088,7 @@ PENTING:
   const handleVoteComfort = async (choice: 'sangat_nyaman' | 'biasa_saja' | 'cukup_khawatir') => {
     if (userVoted) return;
     try {
-      const res = await fetch('http://localhost:4000/poll/vote', {
+      const res = await fetch(`${BASE_URL}/poll/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1163,7 +1163,7 @@ ${JSON.stringify(contextData, null, 2)}
 
 Jawablah pertanyaan pengurus dengan ramah, profesional, menggunakan data di atas secara akurat. Berikan analisis, metrik persentase jika relevan, dan rekomendasi solusi yang cerdas untuk meningkatkan kualitas layanan RT/RW. Gunakan Bahasa Indonesia dan format dengan Markdown yang bersih (**tebal** untuk penekanan, bullet points, dll.).`;
 
-      const res = await fetch('http://localhost:4000/ai/chat', {
+      const res = await fetch(`${BASE_URL}/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

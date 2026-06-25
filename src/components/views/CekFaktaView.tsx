@@ -2,6 +2,8 @@ import React from 'react';
 import { Fact, Rumor } from '../../types';
 import { ShieldCheck, ShieldAlert, Search, Send, Plus, Trash2, HelpCircle, Check, X, FileText, Bot, Loader2, Edit } from 'lucide-react';
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://civicinsight-backend-production.up.railway.app';
+
 /**
  * Interface props untuk CekFaktaView
  */
@@ -152,7 +154,7 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
       // 1. BANSOS intent
       if (lower.includes('bansos') || lower.includes('bantuan sosial') || lower.includes('bpnt') || lower.includes('pkh') || lower.includes('pbi-jk') || lower.includes('dtks')) {
         try {
-          const res = await fetch("http://localhost:4000/news/bansos");
+          const res = await fetch(`${BASE_URL}/news/bansos`);
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
             let filtered = data;
@@ -180,7 +182,7 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
       // 2. JAKI intent
       else if (lower.includes('jaki') || (lower.includes('jakarta') && (lower.includes('aduan') || lower.includes('lapor') || lower.includes('infrastruktur')))) {
         try {
-          const res = await fetch("http://localhost:4000/news/jaki");
+          const res = await fetch(`${BASE_URL}/news/jaki`);
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
             let filtered = data;
@@ -231,7 +233,7 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
           const matchedHealthKeyword = healthKeywords.find(k => lower.includes(k));
           const queryWord = searchTerm || matchedHealthKeyword || '';
           
-          const res = await fetch(`http://localhost:4000/health/news?q=${encodeURIComponent(queryWord)}`);
+          const res = await fetch(`${BASE_URL}/health/news?q=${encodeURIComponent(queryWord)}`);
           const data = await res.json();
           const list = data.value || data;
           
@@ -266,7 +268,7 @@ Penting:
 - Berikan disclaimer bahwa saran medis tetap harus dikonsultasikan ke tenaga kesehatan profesional`;
 
             try {
-              const aiRes = await fetch('http://localhost:4000/ai/chat', {
+              const aiRes = await fetch(`${BASE_URL}/ai/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -301,8 +303,8 @@ Penting:
         if (!isGreeting && !isNavigation && queryTerm) {
           try {
             const [cnnRes, tempoRes] = await Promise.all([
-              fetch(`http://localhost:4000/news/cnn/search?q=${encodeURIComponent(queryTerm)}`),
-              fetch(`http://localhost:4000/news/tempo/search?q=${encodeURIComponent(queryTerm)}`)
+              fetch(`${BASE_URL}/news/cnn/search?q=${encodeURIComponent(queryTerm)}`),
+              fetch(`${BASE_URL}/news/tempo/search?q=${encodeURIComponent(queryTerm)}`)
             ]);
             
             const cnnData = await cnnRes.json();
@@ -336,7 +338,7 @@ Penting:
 - Jika tidak tahu, katakan jujur dan arahkan ke sumber terpercaya`;
 
               try {
-                const aiRes = await fetch('http://localhost:4000/ai/chat', {
+                const aiRes = await fetch(`${BASE_URL}/ai/chat`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ 
@@ -354,7 +356,7 @@ Penting:
               }
               
               if (!reply) {
-                const latestRes = await fetch("http://localhost:4000/news/cnn");
+                const latestRes = await fetch(`${BASE_URL}/news/cnn`);
                 const latestData = await latestRes.json();
                 reply = `🔍 **[PENCARIAN BERITA: "${queryTerm}"]**\nMaaf, tidak ditemukan berita khusus mengenai kata kunci tersebut.\n\n` +
                   `📰 **Berikut berita terhangat hari ini sebagai gantinya:**\n\n` +
@@ -380,7 +382,7 @@ Penting:
 Jawab dalam Bahasa Indonesia, singkat dan ramah. Format dengan Markdown (**tebal** untuk penekanan).`;
 
           try {
-            const res = await fetch('http://localhost:4000/ai/chat', {
+            const res = await fetch(`${BASE_URL}/ai/chat`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ 
