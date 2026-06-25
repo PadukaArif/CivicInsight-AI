@@ -57,7 +57,7 @@ export const CekFaktaView: React.FC<CekFaktaViewProps> = ({
   const [chatMessages, setChatMessages] = React.useState<Array<{ sender: 'user' | 'ai'; text: string; time: string }>>([
     {
       sender: 'ai',
-      text: 'Halo! Saya ChatBot Cek Fakta. Tanyakan saya apa saja tentang isu sosial yang sedang terjadi di masyarakat/negara atau topik kesehatan yang ingin Anda ketahui. Saya diintegrasikan dengan API Berita dan API Kesehatan real-time.',
+      text: 'Halo! Saya ChatBot Cek Fakta. Tanyakan saya apa saja tentang isu sosial hangat yang sedang terjadi di masyarakat atau topik kesehatan yang ingin Anda ketahui. Saya siap menyajikan fakta dan informasi terbaru untuk Anda.',
       time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
     }
   ]);
