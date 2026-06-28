@@ -239,29 +239,45 @@ export function useCivicData() {
 
   // ======================== API INTEGRATION HELPERS ========================
   const refreshAllData = async () => {
-    // BASE_URL is now global
     try {
-      // 1. Fetch approved users
-      const approvedRes = await fetch(`${BASE_URL}/auth/approved`);
-      const approvedVal = await approvedRes.json();
-      let approvedList = [];
-      if (approvedVal.success) {
-        approvedList = approvedVal.data || [];
+      const [
+        approvedRes,
+        pendingRes,
+        annRes,
+        factsRes,
+        rumorsRes,
+        aduanRes,
+        kasRes,
+        hhRes,
+        quizRes,
+        contactsRes,
+        pollRes
+      ] = await Promise.all([
+        fetch(`${BASE_URL}/auth/approved`).then(r => r.json()).catch(() => ({ success: false })),
+        fetch(`${BASE_URL}/auth/pending`).then(r => r.json()).catch(() => ({ success: false })),
+        fetch(`${BASE_URL}/announcements`).then(r => r.json()).catch(() => ({ success: false })),
+        fetch(`${BASE_URL}/facts`).then(r => r.json()).catch(() => ({ success: false })),
+        fetch(`${BASE_URL}/rumors`).then(r => r.json()).catch(() => ({ success: false })),
+        fetch(`${BASE_URL}/aduan`).then(r => r.json()).catch(() => ({ success: false })),
+        fetch(`${BASE_URL}/kas`).then(r => r.json()).catch(() => ({ success: false })),
+        fetch(`${BASE_URL}/households`).then(r => r.json()).catch(() => ({ success: false })),
+        fetch(`${BASE_URL}/quiz/questions`).then(r => r.json()).catch(() => ({ success: false })),
+        fetch(`${BASE_URL}/contacts`).then(r => r.json()).catch(() => ({ success: false })),
+        fetch(`${BASE_URL}/poll`).then(r => r.json()).catch(() => ({ success: false }))
+      ]);
+
+      let approvedList: any[] = [];
+      if (approvedRes.success) {
+        approvedList = approvedRes.data || [];
         setApprovedUsers(approvedList);
       }
 
-      // 2. Fetch pending users
-      const pendingRes = await fetch(`${BASE_URL}/auth/pending`);
-      const pendingVal = await pendingRes.json();
-      if (pendingVal.success) {
-        setPendingRegistrations(pendingVal.data || []);
+      if (pendingRes.success) {
+        setPendingRegistrations(pendingRes.data || []);
       }
 
-      // 3. Fetch announcements
-      const annRes = await fetch(`${BASE_URL}/announcements`);
-      const annVal = await annRes.json();
-      if (annVal.success) {
-        setAnnouncements((annVal.data || []).map((ann: any) => ({
+      if (annRes.success) {
+        setAnnouncements((annRes.data || []).map((ann: any) => ({
           id: ann.id,
           kategori: ann.category,
           judul: ann.title,
@@ -271,11 +287,8 @@ export function useCivicData() {
         })));
       }
 
-      // 4. Fetch facts
-      const factsRes = await fetch(`${BASE_URL}/facts`);
-      const factsVal = await factsRes.json();
-      if (factsVal.success) {
-        setVerifiedFacts((factsVal.data || []).map((f: any) => ({
+      if (factsRes.success) {
+        setVerifiedFacts((factsRes.data || []).map((f: any) => ({
           id: f.id,
           judul: f.judul,
           penjelasan: f.penjelasan,
@@ -285,11 +298,8 @@ export function useCivicData() {
         })));
       }
 
-      // 5. Fetch rumors
-      const rumorsRes = await fetch(`${BASE_URL}/rumors`);
-      const rumorsVal = await rumorsRes.json();
-      if (rumorsVal.success) {
-        const filteredRumors = (rumorsVal.data || [])
+      if (rumorsRes.success) {
+        const filteredRumors = (rumorsRes.data || [])
           .filter((r: any) => r.status === 'Belum Diverifikasi')
           .map((r: any) => ({
             id: r.id,
@@ -301,11 +311,8 @@ export function useCivicData() {
         setSubmittedRumors(filteredRumors);
       }
 
-      // 6. Fetch aduan
-      const aduanRes = await fetch(`${BASE_URL}/aduan`);
-      const aduanVal = await aduanRes.json();
-      if (aduanVal.success) {
-        setAduanList((aduanVal.data || []).map((ad: any) => ({
+      if (aduanRes.success) {
+        setAduanList((aduanRes.data || []).map((ad: any) => ({
           id: ad.id,
           wargaId: ad.accountId,
           account_id: ad.accountId,
@@ -320,11 +327,8 @@ export function useCivicData() {
         })));
       }
 
-      // 7. Fetch kas ledger
-      const kasRes = await fetch(`${BASE_URL}/kas`);
-      const kasVal = await kasRes.json();
-      if (kasVal.success) {
-        const ledger = kasVal.data || [];
+      if (kasRes.success) {
+        const ledger = kasRes.data || [];
         setKasLedger(ledger);
         const total = ledger.reduce((sum: number, tx: any) => {
           return tx.jenis === 'pemasukan' ? sum + tx.jumlah : sum - tx.jumlah;
@@ -332,12 +336,9 @@ export function useCivicData() {
         setKasRT(total);
       }
 
-      // 8. Fetch households
-      const hhRes = await fetch(`${BASE_URL}/households`);
-      const hhVal = await hhRes.json();
-      let hhList = [];
-      if (hhVal.success) {
-        hhList = (hhVal.data || []).map((h: any) => ({
+      let hhList: any[] = [];
+      if (hhRes.success) {
+        hhList = (hhRes.data || []).map((h: any) => ({
           id: h.id,
           kepalaKeluarga: h.kepalaKeluarga,
           noKk: h.kkNo,
@@ -357,28 +358,18 @@ export function useCivicData() {
         setHouseholds(hhList);
       }
 
-      // 9. Fetch quiz questions
-      const quizRes = await fetch(`${BASE_URL}/quiz/questions`);
-      const quizVal = await quizRes.json();
-      if (quizVal.success) {
-        setQuizQuestions(quizVal.data || []);
+      if (quizRes.success) {
+        setQuizQuestions(quizRes.data || []);
       }
 
-      // 10. Fetch emergency contacts
-      const contactsRes = await fetch(`${BASE_URL}/contacts`);
-      const contactsVal = await contactsRes.json();
-      if (contactsVal.success) {
-        setEmergencyContacts(contactsVal.data || []);
+      if (contactsRes.success) {
+        setEmergencyContacts(contactsRes.data || []);
       }
 
-      // 11. Fetch poll results
-      const pollRes = await fetch(`${BASE_URL}/poll`);
-      const pollVal = await pollRes.json();
-      if (pollVal.success) {
-        setPollResults(pollVal.data || { sangat_nyaman: 0, biasa_saja: 0, cukup_khawatir: 0 });
+      if (pollRes.success) {
+        setPollResults(pollRes.data || { sangat_nyaman: 0, biasa_saja: 0, cukup_khawatir: 0 });
       }
 
-      // Calculate totalWarga
       const totalHhMembers = hhList.reduce((sum: number, h: any) => sum + (h.members ? h.members.length : 0), 0);
       setTotalWarga(Math.max(approvedList.length, totalHhMembers));
 
