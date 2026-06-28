@@ -58,33 +58,36 @@ body::before {
   }
 }
 
-@media (prefers-reduced-motion) {
-  *,
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-marquee),
   ::before,
   ::after {
     animation: none !important;
   }
 }
 
-/* Custom infinite horizontal marquee animation */
+/* Custom infinite horizontal marquee animation with GPU hardware acceleration */
 @keyframes marquee {
   0% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
 .animate-marquee {
   display: flex;
   width: max-content;
-  animation: marquee 35s linear infinite;
+  will-change: transform;
+  animation: marquee 35s linear infinite !important;
+  animation-play-state: running !important;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .animate-marquee:hover {
-    animation-play-state: paused;
+    animation-play-state: paused !important;
   }
 }
+
 
