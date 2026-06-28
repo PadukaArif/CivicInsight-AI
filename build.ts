@@ -13,7 +13,6 @@ const result = await Bun.build({
   plugins: [tailwind],
   minify: true,
   target: "browser",
-  sourcemap: "linked",
   define: {
     "process.env.NODE_ENV": JSON.stringify("production"),
     "process.env.VITE_API_URL": JSON.stringify(process.env.VITE_API_URL || "https://civicinsight-ai-backend.up.railway.app"),

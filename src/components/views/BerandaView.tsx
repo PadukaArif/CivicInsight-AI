@@ -99,7 +99,7 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
     setPoinInput(poinWarga.toString());
   }, [totalWarga, kasRT, poinWarga]);
 
-  // State untuk dokumentasi kegiatan
+  // State untuk dokumentasi kegiatan dengan migrasi otomatis path gambar yang usang
   const [photos, setPhotos] = React.useState<Array<{ id: string; url: string; judul: string; tanggal: string }>>(() => {
     const currentMonthKey = new Date().toISOString().substring(0, 7); // Format: YYYY-MM
     const storedMonthKey = localStorage.getItem('civic_activity_month');
@@ -112,7 +112,20 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
     const storedPhotos = localStorage.getItem('civic_activity_photos');
     if (storedPhotos) {
       try {
-        return JSON.parse(storedPhotos);
+        const parsed = JSON.parse(storedPhotos);
+        // Migrasi URL gambar lama agar selalu merujuk ke path static bundle yang aktif di versi produksi
+        return parsed.map((photo: any) => {
+          if (photo.id === 'def-1' || photo.id === 'def-4' || (typeof photo.url === 'string' && (photo.url.includes('kerja_bakti.png') || photo.url.includes('kerja_bakti-')))) {
+            return { ...photo, url: kerjaBaktiImg };
+          }
+          if (photo.id === 'def-2' || photo.id === 'def-5' || (typeof photo.url === 'string' && (photo.url.includes('gotong_royong.png') || photo.url.includes('gotong_royong-')))) {
+            return { ...photo, url: gotongRoyongImg };
+          }
+          if (photo.id === 'def-3' || photo.id === 'def-6' || (typeof photo.url === 'string' && (photo.url.includes('ronda_malam.png') || photo.url.includes('ronda_malam-')))) {
+            return { ...photo, url: rondaMalamImg };
+          }
+          return photo;
+        });
       } catch (e) {
         console.error(e);
       }
@@ -129,9 +142,13 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
     return defaultData;
   });
 
-  // Sinkronisasi perubahan state ke LocalStorage
+  // Sinkronisasi perubahan state ke LocalStorage dengan pengaman try-catch (limit 5MB)
   React.useEffect(() => {
-    localStorage.setItem('civic_activity_photos', JSON.stringify(photos));
+    try {
+      localStorage.setItem('civic_activity_photos', JSON.stringify(photos));
+    } catch (e) {
+      console.error('Penyimpanan lokal penuh!', e);
+    }
   }, [photos]);
 
   // Handler Unggah Foto Kegiatan Baru (Admin)
@@ -553,7 +570,7 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
             <div className="absolute right-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none" />
 
             {/* Jalur Animasi Gerak */}
-            <div className="flex animate-marquee gap-4 hover:[animation-play-state:paused] transition-all duration-300">
+            <div className="flex animate-marquee gap-4 transition-all duration-300">
               {[...photos, ...photos].map((item, idx) => (
                 <div
                   key={`${item.id}-${idx}`}

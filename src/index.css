@@ -82,3 +82,9 @@ body::before {
   animation: marquee 35s linear infinite;
 }
 
+@media (hover: hover) {
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+}
+
