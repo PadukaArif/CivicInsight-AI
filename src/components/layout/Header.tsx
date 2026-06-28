@@ -94,8 +94,8 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </div>
 
-        {/* Judul Halaman Aktif - Hanya tampil di Mobile */}
-        <h1 className="text-slate-800 font-bold text-base md:hidden tracking-tight">
+        {/* Judul Halaman Aktif - Hanya tampil di Mobile dengan Truncate agar tidak bertabrakan */}
+        <h1 className="text-slate-800 font-bold text-sm sm:text-base md:hidden tracking-tight truncate max-w-[130px] xs:max-w-[170px] sm:max-w-none">
           {currentTabTitle}
         </h1>
       </div>
@@ -115,11 +115,11 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* KANAN: Selektor RT/RW, Badge Peran, & Informasi Pengguna */}
-      <div className="flex items-center gap-3 md:gap-5 md:justify-self-end">
-        {/* Selektor RT/RW - Made static & read-only */}
-        <div className="bg-slate-50 border border-slate-300 text-slate-700 font-bold text-xs px-3 py-1.5 rounded-xl flex items-center gap-1.5 select-none">
+      <div className="flex items-center gap-2 sm:gap-3 md:gap-5 md:justify-self-end shrink-0">
+        {/* Selektor RT/RW - Sembunyikan di layar ponsel sangat kecil untuk mencegah tabrakan navbar */}
+        <div className="hidden sm:flex bg-slate-50 border border-slate-300 text-slate-700 font-bold text-xs px-2.5 sm:px-3 py-1.5 rounded-xl items-center gap-1.5 select-none">
           <MapPin size={13} className="text-civic-primary shrink-0" />
-          <span>RT 04 / RW 02</span>
+          <span className="whitespace-nowrap">RT 04 / RW 02</span>
         </div>
 
         {/* Badge Peran Aktif (Warga / Admin) - Admin dirubah dari Gold ke Biru */}
