@@ -225,6 +225,7 @@ export function App() {
         return (
           <LaporAduanView
             isAdmin={isAdmin}
+            currentUser={currentUser}
             aduanList={aduanList}
             onSubmitAduan={handleSubmitAduan}
             onUpdateAduanStatus={handleUpdateAduanStatus}

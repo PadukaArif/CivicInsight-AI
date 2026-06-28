@@ -307,6 +307,8 @@ export function useCivicData() {
       if (aduanVal.success) {
         setAduanList((aduanVal.data || []).map((ad: any) => ({
           id: ad.id,
+          wargaId: ad.accountId,
+          account_id: ad.accountId,
           wargaNama: ad.reporterName || 'Warga Teladan RT 04',
           kategori: ad.kategori,
           deskripsi: ad.deskripsi,

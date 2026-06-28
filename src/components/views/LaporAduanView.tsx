@@ -7,6 +7,7 @@ import { Megaphone, MapPin, CheckCircle, Clock, AlertCircle, Send, Trash2, HelpC
  */
 export interface LaporAduanViewProps {
   isAdmin: boolean; // Peran pengguna saat ini
+  currentUser?: any; // Data pengguna aktif saat ini
   aduanList: Aduan[]; // Riwayat seluruh aduan warga
   onSubmitAduan: (kategori: string, lokasi: string, deskripsi: string) => void; // Aksi kirim aduan warga
   onUpdateAduanStatus: (id: number, status: 'Terkirim' | 'Diproses' | 'Selesai', response?: string) => void; // Aksi tindak lanjut admin
@@ -15,6 +16,7 @@ export interface LaporAduanViewProps {
 
 export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
   isAdmin,
+  currentUser,
   aduanList,
   onSubmitAduan,
   onUpdateAduanStatus,
@@ -224,7 +226,15 @@ export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
                 </div>
               ) : (
                 sortedAduans
-                  .filter((a) => wargaActiveTab === 'lingkungan' || a.wargaNama === 'Warga Teladan RT 04')
+                  .filter((a) => {
+                    if (wargaActiveTab === 'lingkungan') return true;
+                    if (currentUser && currentUser !== 'admin') {
+                      return String(a.wargaId || a.account_id) === String(currentUser.id) || 
+                             a.wargaNama === currentUser.full_name || 
+                             a.wargaNama === currentUser.username;
+                    }
+                    return a.wargaNama === 'Warga Teladan RT 04';
+                  })
                   .map((aduan) => (
                     <div
                       key={aduan.id}
