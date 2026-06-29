@@ -815,16 +815,32 @@ PENTING:
   // K. Membuat Aduan Baru (Warga)
   const handleSubmitAduan = async (kategori: string, lokasi: string, deskripsi: string) => {
     try {
-      await fetch(`${BASE_URL}/aduan`, {
+      const targetAccountId = (currentUser && typeof currentUser === 'object' && currentUser.id) ? Number(currentUser.id) : 1;
+      const res = await fetch(`${BASE_URL}/aduan`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          accountId: currentUser?.id || 1,
+          accountId: targetAccountId,
           kategori,
           lokasi,
           deskripsi
         })
       });
+      const data = await res.json();
+      if (data.success && data.data?.id) {
+        const newAduan: Aduan = {
+          id: data.data.id,
+          wargaId: targetAccountId,
+          account_id: targetAccountId,
+          wargaNama: (currentUser && typeof currentUser === 'object' && (currentUser.full_name || currentUser.fullName || currentUser.username)) || 'Warga Teladan RT 04',
+          kategori,
+          deskripsi,
+          lokasi,
+          status: 'Terkirim',
+          tanggal: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+        };
+        setAduanList((prev) => [newAduan, ...prev]);
+      }
       await refreshAllData();
     } catch (e) {
       console.error(e);
