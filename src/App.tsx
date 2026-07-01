@@ -133,6 +133,11 @@ export function App() {
     handleResetAllData,
   } = useCivicData();
 
+  // Scroll window to top whenever currentTab changes
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentTab]);
+
   // ======================== ROUTER SWITCH MODUL VIEW ========================
   const renderActiveView = () => {
     switch (currentTab) {

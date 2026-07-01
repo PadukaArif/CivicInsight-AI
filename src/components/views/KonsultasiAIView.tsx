@@ -73,12 +73,20 @@ export const KonsultasiAIView: React.FC<KonsultasiAIViewProps> = ({
     ));
   };
 
-  // Auto-scroll container obrolan internal ke paling bawah saat ada pesan baru tanpa memicu scroll window/body
+  // Scroll window & container to top on mount
   React.useEffect(() => {
+    window.scrollTo(0, 0);
     if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = 0;
+    }
+  }, []);
+
+  // Auto-scroll container obrolan internal ke paling bawah saat asisten mengetik jawaban baru
+  React.useEffect(() => {
+    if (isTyping && chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [chatMessages, isTyping]);
+  }, [isTyping]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,11 +180,9 @@ export const KonsultasiAIView: React.FC<KonsultasiAIViewProps> = ({
             </div>
           </div>
         )}
-
-
       </div>
 
-      {/* 3. Panel Pertanyaan Populer (Saran Pintar, Lebih ke bawah & hemat ruang) */}
+      {/* 3. Panel Pertanyaan Populer (Saran Cepat) */}
       <div className="bg-slate-50 px-3 py-1.5 border-t border-slate-150 flex flex-wrap gap-1.5 items-center justify-center shrink-0">
         <span className="text-[9px] font-extrabold text-slate-450 uppercase tracking-wider flex items-center gap-1">
           <HelpCircle size={10} />

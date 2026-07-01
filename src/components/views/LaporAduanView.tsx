@@ -59,6 +59,8 @@ export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
     return sortedAduans.filter((a) => a.status === adminActiveFilter);
   }, [sortedAduans, adminActiveFilter]);
 
+
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!lokasi.trim() || !deskripsi.trim()) {
@@ -68,6 +70,7 @@ export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
     onSubmitAduan(kategori, lokasi.trim(), deskripsi.trim());
     setLokasi('');
     setDeskripsi('');
+
     alert('Laporan aduan Anda berhasil terkirim. Pengurus RT akan meninjau dan memperbarui status laporan secara berkala.');
   };
 
@@ -278,7 +281,6 @@ export const LaporAduanView: React.FC<LaporAduanViewProps> = ({
               )}
             </div>
           </div>
-
         </div>
       ) : (
         /* ======================== VIEW ADMIN (KELOLA) ======================== */
