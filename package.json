@@ -1,6 +1,13 @@
 {
-  "name": "bun-react-template",
-  "version": "0.1.0",
+  "name": "civicinsight-ai-frontend",
+  "version": "1.0.0",
+  "description": "CivicInsight AI Frontend - Portal digital terpadu RT/RW berbasis AI",
+  "author": "Arif <arifraffyfadlurahman@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PadukaArif/CivicInsight-AI.git"
+  },
   "private": true,
   "type": "module",
   "scripts": {
