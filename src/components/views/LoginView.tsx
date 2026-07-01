@@ -19,10 +19,10 @@ export const LoginView: React.FC<LoginViewProps> = ({
   const [wargaMode, setWargaMode] = React.useState<'login' | 'register'>('login');
 
   // Input states
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [adminUser, setAdminUser] = React.useState('');
-  const [adminPass, setAdminPass] = React.useState('');
+  const [email, setEmail] = React.useState('warga@civicinsight.id');
+  const [password, setPassword] = React.useState('warga123');
+  const [adminUser, setAdminUser] = React.useState('admin');
+  const [adminPass, setAdminPass] = React.useState('admin123');
 
   // Register states
   const [regName, setRegName] = React.useState('');
