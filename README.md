@@ -26,6 +26,11 @@
   </a>
 </p>
 
+> [!IMPORTANT]
+> ### 📥 Download Android App (APK)
+> Anda dapat mengunduh berkas aplikasi Android siap pakai (APK) langsung dari repositori ini:  
+> 👉 **[Download CivicInsight.apk (v1.0.0)](./CivicInsight.apk)**
+
 ---
 
 ## 📑 Table of Contents
